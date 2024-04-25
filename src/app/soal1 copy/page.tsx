@@ -8,8 +8,8 @@ import { DropdownMenuDemo } from '@/components/Drop';
 import { Bsoal1 } from '@/components/Bread';
 import { Select } from "@/components/ui/select";
 import { eNFAConverterRepository } from "./E_NFAConverter";
-import { nfaConverterRepository } from "./konverterNFA";
-import ComponentTableNFA from "./tabelNFA";
+import { nfaConverterRepository } from "./NFAConverter";
+import ComponentTableNFA from "./NFA";
 
 import { 
   NFA2DFADataProps,

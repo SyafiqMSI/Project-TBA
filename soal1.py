@@ -34,14 +34,12 @@ class NFA:
 
                 if next_state not in dfa_states:
                     dfa_states.append(next_state)
-
-        # Remove unreachable states
+        
         reachable_states = set()
         for state in dfa_transitions.values():
             reachable_states.update(state)
         dfa_states = [state for state in dfa_states if state[0] in reachable_states]
 
-        # Find accept states
         for state in dfa_states:
             for accept_state in self.accept_states:
                 if accept_state in state:
@@ -95,9 +93,11 @@ def main():
     dfa = nfa.convert_to_dfa()
 
     print("Menu:")
-    print("1. NFA")
-    print("2. e-NFA")
-    choice = input("Pilih jenis automata (1/2): ")
+    print("1. Contoh NFA")
+    print("2. Contoh e-NFA")
+    print("3. Konversi NFA")
+    print("4. Konversi e-NFA")
+    choice = input("Input: ")
 
     if choice == '1':
         dfa.display_dfa_states()
