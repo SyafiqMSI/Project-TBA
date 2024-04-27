@@ -40,7 +40,7 @@ export function CardWithForm() {
               </CardHeader>
             </Card>
           </Link>
-          <Link href="/soal1">
+          <Link href="/soal3">
             <Card style={cardStyle}>
               <CardHeader>
                 <CardTitle>Minimalism</CardTitle>
@@ -52,7 +52,7 @@ export function CardWithForm() {
         </div>
         
         <div className="bottom-cards" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-          <Link href="/soal1">
+          <Link href="/soal4">
             <Card style={cardStyle}>
               <CardHeader>
                 <CardTitle>Equivalensi</CardTitle>
@@ -61,7 +61,7 @@ export function CardWithForm() {
               </CardHeader>
             </Card>
           </Link>
-          <Link href="/soal1">
+          <Link href="/soal5">
             <Card style={cardStyle}>
               <CardHeader>
                 <CardTitle>Testing</CardTitle>
