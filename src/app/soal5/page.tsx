@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NavigationMenuDemo } from '@/components/Nav';
-import { DropdownMenuDemo } from '@/components/Drop';
+import { SelectFA5 } from '@/components/Drop5';
 import { Bsoal5 } from '@/components/Bread';
 import { Select } from "@/components/ui/select";
 import "./style.css";
@@ -139,6 +139,15 @@ export default function Soal1() {
                             />
                         </div>
                     ))}
+                </div>
+                <div className="mt-1 space-y-2">
+                <Label htmlFor="automataType" className="jenisFA">Jenis Finite Automata</Label>
+                <Select defaultValue={jenisFA} onValueChange={(v) => setjenisFA(v)}>
+                  <SelectFA5 />
+                </Select>
+                </div>
+                <div className="mt-8 px-1 py-5">
+                    <Button onClick={onClickButtonGenerate}>Test</Button>
                 </div>
 
 

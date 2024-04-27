@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NavigationMenuDemo } from '@/components/Nav';
-import { DropdownMenuDemo } from '@/components/Drop';
+import { SelectFA } from '@/components/Drop';
 import { Bsoal2 } from '@/components/Bread';
 import { Select } from "@/components/ui/select";
 import "./style.css";

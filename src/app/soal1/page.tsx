@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NavigationMenuDemo } from '@/components/Nav';
-import { DropdownMenuDemo } from '@/components/Drop';
+import { SelectFA } from '@/components/Drop';
 import { Bsoal1 } from '@/components/Bread';
 import { Select } from "@/components/ui/select";
 import { eNFAConverterRepository } from "./ts/konverterENFA";
@@ -204,7 +204,7 @@ export default function Soal1() {
               <div className="mt-1 space-y-2">
                 <Label htmlFor="automataType" className="jenisFA">Jenis Finite Automata</Label>
                 <Select defaultValue={jenisFA} onValueChange={(v) => setjenisFA(v)}>
-                  <DropdownMenuDemo />
+                  <SelectFA />
                 </Select>
               </div>
               <div className="mt-8 px-1 py-5">
