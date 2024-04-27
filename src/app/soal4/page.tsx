@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NavigationMenuDemo } from '@/components/Nav';
-import { DropdownMenuDemo } from '@/components/Drop';
 import { Bsoal4 } from '@/components/Bread';
 import { Select } from "@/components/ui/select";
 import "./style.css";
+import { areEquivalent, DFA } from './ekuivalensi';
 
 import { Button } from '@/components/ui/button';
 
@@ -100,7 +100,27 @@ export default function Soal4() {
     };
 
     const onClickButtonGenerate = () => {
+        const dfa1: DFA = {
+            states: states1.split(','),
+            alphabets: alphabets1.split(','),
+            startState: startState1,
+            finalStates: final1.split(','),
+            transitions: transitions1,
+        };
+    
+        const dfa2: DFA = {
+            states: states2.split(','),
+            alphabets: alphabets2.split(','),
+            startState: startState2,
+            finalStates: final2.split(','),
+            transitions: transitions2,
+        };
 
+        console.log("DFA 1:", dfa1);
+        console.log("DFA 2:", dfa2);
+    
+        const equivalent = areEquivalent(dfa1, dfa2);
+        alert(`Are the DFAs equivalent? ${equivalent ? 'Yes' : 'No'}`);
     };
 
 
