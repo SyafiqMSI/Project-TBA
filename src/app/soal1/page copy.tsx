@@ -10,7 +10,6 @@ import { Select } from "@/components/ui/select";
 import { eNFAConverterRepository } from "./ts/konverterENFA";
 import { nfaConverterRepository } from "./ts/konverterNFA";
 import ComponentTableNFA from "./tabelNFA";
-import ComponentTableE_NFA from "./tabelENFA";
 import "./style.css";
 
 import {
@@ -37,7 +36,7 @@ export default function Soal1() {
   const [states, setStates] = useState<string>("q0,q1,q2");
   const [alphabets, setAlphabets] = useState<string>("0,1");
   const [startState, setStartState] = useState<string>("q0");
-  const [finalStates, setFinalState] = useState<string>("q2");
+  const [final, setFinalState] = useState<string>("q2");
   const [jenisFA, setjenisFA] = useState<string>("nfa");
   const [svgResponse1, setSvgResponse1] = useState<string>('');
   const [svgResponse2, setSvgResponse2] = useState<string>('');
@@ -48,8 +47,10 @@ export default function Soal1() {
   });
   const [epsilons, setEpsilons] = useState<{ [key: string]: string; }>({
     q0: "q1",
-    q1: "q0",
-    q2: "q2",
+    q1: "q3",
+    q2: "q4",
+    q3: "",
+    q4: "",
   });
 
   const [automata, setAutomata] = useState<Input_Automata>({
@@ -122,7 +123,7 @@ export default function Soal1() {
         states,
         alphabets,
         startState,
-        finalStates,
+        finalStates: final,
         transitions,
       });
 
@@ -131,8 +132,8 @@ export default function Soal1() {
       const result = eNFAConverterRepository.generateDFA({
         states,
         alphabets,
-        startState,
-        finalStates,
+        startState: startState,
+        finalStates: final,
         transitions,
         epsilons,
       });
@@ -197,7 +198,7 @@ export default function Soal1() {
                 <Input
                   type="text"
                   placeholder="q0/q1/..."
-                  value={finalStates}
+                  value={final}
                   onChange={handleFinalChange}
                 />
               </div>
@@ -228,39 +229,10 @@ export default function Soal1() {
               ))}
             </div>
 
-            {jenisFA === "e-nfa" && (
-            <>
-              <div>
-                <p className="text-lg font-semibold pt-4">Epsilon</p>
-                <p>Pisahkan setiap state menggunakan tanda koma (,)</p>
-              </div>
-              <div className="gap-2 grid grid-cols-2">
-                {states.split(",").map((item, index) => (
-                  <div className="space-y-1" key={"input-epsilon-" + index}>
-                    <Label>Masukkan epsilon ({item})</Label>
-                    <Input
-                      placeholder="0,1,..."
-                      value={epsilons[item]}
-                      onChange={(e) =>
-                        setEpsilons({
-                          ...epsilons,
-                          [item]: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
           </div>
           <div className="mx-left max-w-[300px]" style={{ marginLeft: '60px' }}>
             {jenisFA === "nfa" && nfa2dfaData && (
               <ComponentTableNFA {...nfa2dfaData} />
-            )}
-             {jenisFA === "e-nfa" && eNfa2dfaData && (
-              <ComponentTableE_NFA {...eNfa2dfaData} />
             )}
 
           </div>

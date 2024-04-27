@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ArrowRight } from "lucide-react";
-import { NFA2DFADataProps } from "./type";
+import { NFA2DFADataProps } from "./ts/type";
 
 export default function TableNFA({
   nfaData,

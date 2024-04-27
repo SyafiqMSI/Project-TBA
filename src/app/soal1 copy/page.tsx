@@ -9,7 +9,7 @@ import { Bsoal1 } from '@/components/Bread';
 import { Select } from "@/components/ui/select";
 import { eNFAConverterRepository } from "./E_NFAConverter";
 import { nfaConverterRepository } from "./NFAConverter";
-import ComponentTableNFA from "./NFA";
+import ComponentTableNFA from "./tabel";
 
 import { 
   NFA2DFADataProps,

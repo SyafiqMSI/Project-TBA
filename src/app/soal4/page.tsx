@@ -15,56 +15,86 @@ interface Transitions {
     [key: string]: string;
 }
 
-export default function Soal1() {
-    const [states, setStates] = useState<string>("q0,q1,q2");
-    const [alphabets, setAlphabets] = useState<string>("0,1");
-    const [startState, setStartState] = useState<string>("q0");
-    const [final, setFinalState] = useState<string>("q2");
-    const [jenisFA, setjenisFA] = useState<string>("nfa");
-    const [transitions, setTransitions] = useState<Transitions>({
-        q0: "q0,q1:q0",
-        q1: ":q2",
-        q2: ":",
+export default function Soal4() {
+    const [states1, setStates1] = useState<string>("q0,q1,q2");
+    const [states2, setStates2] = useState<string>("q3,q4,q5,q6");
+    const [alphabets1, setAlphabets1] = useState<string>("0,1");
+    const [alphabets2, setAlphabets2] = useState<string>("0,1");
+    const [startState1, setStartState1] = useState<string>("q0");
+    const [startState2, setStartState2] = useState<string>("q3");
+    const [final1, setFinalState1] = useState<string>("q0");
+    const [final2, setFinalState2] = useState<string>("q3");
+    const [transitions1, setTransitions1] = useState<Transitions>({
+        q0: "q0:q1",
+        q1: "q2:q0",
+        q2: "q1:q2",
     });
-    const [epsilons, setEpsilons] = useState<{ [key: string]: string; }>({
-        q0: "q1",
-        q1: "q3",
-        q2: "q4",
-        q3: "",
-        q4: "",
+    const [transitions2, setTransitions2] = useState<Transitions>({
+        q3: "q3:q4",
+        q4: "q5:q3",
+        q5: "q6:q5",
+        q6: "q5:q3",
     });
 
-    const handleStateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleStateChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newStates = event.target.value;
-        setStates(newStates);
+        setStates1(newStates);
         const stateArray = newStates.split(',');
         const newTransitions: Transitions = {};
         stateArray.forEach(state => {
-            newTransitions[state] = transitions[state] || '';
+            newTransitions[state] = transitions1[state] || '';
         });
-        setTransitions(newTransitions);
+        setTransitions1(newTransitions);
     };
 
-    const handleAlphabetsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAlphabets(event.target.value);
+    const handleAlphabetsChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setAlphabets1(event.target.value);
     };
 
-    const handleStartChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setStartState(event.target.value);
+    const handleStartChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setStartState1(event.target.value);
     };
 
-    const handleFinalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setFinalState(event.target.value);
+    const handleFinalChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFinalState1(event.target.value);
     };
 
-    const handleAutomataTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setjenisFA(event.target.value);
-    };
-
-    const handleTransitionChange = (state: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleTransitionChange1 = (state: string, event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
-        setTransitions({
-            ...transitions,
+        setTransitions1({
+            ...transitions1,
+            [state]: value,
+        });
+    };
+
+
+    const handleStateChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newStates = event.target.value;
+        setStates2(newStates);
+        const stateArray = newStates.split(',');
+        const newTransitions: Transitions = {};
+        stateArray.forEach(state => {
+            newTransitions[state] = transitions2[state] || '';
+        });
+        setTransitions2(newTransitions);
+    };
+
+    const handleAlphabetsChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setAlphabets2(event.target.value);
+    };
+
+    const handleStartChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setStartState2(event.target.value);
+    };
+
+    const handleFinalChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFinalState2(event.target.value);
+    };
+
+    const handleTransitionChange2 = (state: string, event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+        setTransitions2({
+            ...transitions2,
             [state]: value,
         });
     };
@@ -91,31 +121,34 @@ export default function Soal1() {
                     </p>
                 </div>
 
+                <h1 className="font-bold text-2xl mt-4" style={{ fontSize: '1.5em' }}>
+                    DFA 1
+                </h1>
                 <div className="mt-5 space-y-2">
-                    <Label htmlFor="states" className="states">States</Label>
+                    <Label htmlFor="states1" className="states1">States</Label>
                     <Input
                         type="text"
                         placeholder="q0,q1,..."
-                        defaultValue={states}
-                        onChange={handleStateChange}
+                        defaultValue={states1}
+                        onChange={handleStateChange1}
                     />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="alphabets" className="alphabets">Alphabets</Label>
+                    <Label htmlFor="alphabets1" className="alphabets1">Alphabets</Label>
                     <Input
                         type="text"
                         placeholder="0,1,..."
-                        defaultValue={alphabets}
-                        onChange={handleAlphabetsChange}
+                        defaultValue={alphabets1}
+                        onChange={handleAlphabetsChange1}
                     />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="startState" className="startState" >Start State</Label>
+                    <Label htmlFor="startState1" className="startState1" >Start State</Label>
                     <Input
                         type="text"
                         placeholder="q0/q1/..."
-                        value={startState}
-                        onChange={handleStartChange}
+                        value={startState1}
+                        onChange={handleStartChange1}
                     />
                 </div>
                 <div className="space-y-2">
@@ -123,26 +156,87 @@ export default function Soal1() {
                     <Input
                         type="text"
                         placeholder="q0/q1/..."
-                        value={final}
-                        onChange={handleFinalChange}
+                        value={final1}
+                        onChange={handleFinalChange1}
                     />
                 </div>
                 <div className="mt-4 space-y-2 ">
-                    {Object.entries(transitions).map(([state, value], index) => (
+                    {Object.entries(transitions1).map(([state, value], index) => (
                         <div key={index} className="space-y-2">
-                            <Label htmlFor={state} className="Transitions" >Transitions {state} untuk {alphabets}</Label>
+                            <Label htmlFor={state} className="Transitions" >Transitions {state} untuk {alphabets1}</Label>
                             <Input
                                 type="text"
                                 name={state}
                                 value={value}
-                                onChange={(e) => handleTransitionChange(state, e)}
+                                onChange={(e) => handleTransitionChange1(state, e)}
                             />
                         </div>
-                    ))}
+                    ))
+                    }
                 </div>
 
+                <div className="mt-10 space-y-2">
+                    <h1 className="font-bold text-2xl mt-4" style={{ fontSize: '1.5em' }}>
+                        DFA 2
+                    </h1>
 
+                    <div className="mt-5 space-y-2">
+                        <Label htmlFor="states1" className="states1">States</Label>
+                        <Input
+                            type="text"
+                            placeholder="q0,q1,..."
+                            defaultValue={states2}
+                            onChange={handleStateChange2}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="alphabets1" className="alphabets1">Alphabets</Label>
+                        <Input
+                            type="text"
+                            placeholder="0,1,..."
+                            defaultValue={alphabets2}
+                            onChange={handleAlphabetsChange2}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="startState1" className="startState1" >Start State</Label>
+                        <Input
+                            type="text"
+                            placeholder="q0/q1/..."
+                            value={startState2}
+                            onChange={handleStartChange2}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="finalStates" >Final States</Label>
+                        <Input
+                            type="text"
+                            placeholder="q0/q1/..."
+                            value={final2}
+                            onChange={handleFinalChange2}
+                        />
+                    </div>
+                    <div className="mt-4 space-y-2 ">
+                        {Object.entries(transitions2).map(([state, value], index) => (
+                            <div key={index} className="space-y-2">
+                                <Label htmlFor={state} className="Transitions" >Transitions {state} untuk {alphabets2}</Label>
+                                <Input
+                                    type="text"
+                                    name={state}
+                                    value={value}
+                                    onChange={(e) => handleTransitionChange2(state, e)}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div className="mt-8 px-1 py-5">
+                        <Button onClick={onClickButtonGenerate}>Cek Ekuivalen</Button>
+                    </div>
+
+                </div>
             </div>
+
         </main>
     );
 }
