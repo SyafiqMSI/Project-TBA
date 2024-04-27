@@ -140,6 +140,9 @@ export default function Soal1() {
                         </div>
                     ))}
                 </div>
+                <div className="mt-8 px-1 py-5">
+                <Button onClick={onClickButtonGenerate}>Minimize</Button>
+                </div>
 
 
             </div>
