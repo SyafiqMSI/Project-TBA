@@ -84,10 +84,10 @@ export default function Soal1() {
                 <Bsoal2 />
                 <div className="mt-8 space-y-4">
                     <h1 className="font-bold text-3xl mt-4" style={{ fontSize: '2.3em' }}>
-                        NFA e-NFA to DFA
+                        REGEX to e-NFA
                     </h1>
                     <p style={{ fontSize: '1.0em' }}>
-                        Menerima input untuk NFA ataupun e-NFA kemudian mengubahnya menjadi DFA yang berkaitan
+                        Menerima input berupa regular expression dan dapat mengenerate e-NFA yang berhubungan
                     </p>
                 </div>
 

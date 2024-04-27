@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NavigationMenuDemo } from '@/components/Nav';
 import { DropdownMenuDemo } from '@/components/Drop';
-import { Bsoal2 } from '@/components/Bread';
+import { Bsoal3 } from '@/components/Bread';
 import { Select } from "@/components/ui/select";
 import "./style.css";
 
@@ -81,13 +81,13 @@ export default function Soal1() {
             </header>
 
             <div className="mx-auto px-4 max-w-[768px] py-3 mt-1">
-                <Bsoal2 />
+                <Bsoal3 />
                 <div className="mt-8 space-y-4">
                     <h1 className="font-bold text-3xl mt-4" style={{ fontSize: '2.3em' }}>
-                        NFA e-NFA to DFA
+                        DFA Minimization
                     </h1>
                     <p style={{ fontSize: '1.0em' }}>
-                        Menerima input untuk NFA ataupun e-NFA kemudian mengubahnya menjadi DFA yang berkaitan
+                        Menerima input berupa sebuah DFA kemudian membuat jadi minimal, dimana user dapat memasukkan input berupa string untuk mengetes DFA tesebut, baik sebelum maupun sesudah dalam bentuk minimal
                     </p>
                 </div>
 
