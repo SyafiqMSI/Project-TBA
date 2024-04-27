@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Input } from "@/components/ui/input"; 
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NavigationMenuDemo } from '@/components/Nav';
 import { DropdownMenuDemo } from '@/components/Drop';
@@ -12,14 +12,24 @@ import { nfaConverterRepository } from "./konverterNFA";
 import ComponentTableNFA from "./tabelNFA";
 import "./style.css";
 
-import { 
+import {
   NFA2DFADataProps,
   E_NFA2DFADataProps
- } from './type';
+} from './type';
 import { Button } from '@/components/ui/button';
 
 interface Transitions {
   [key: string]: string;
+}
+
+interface Input_Automata {
+  type: string;
+  states: string[];
+  alphabet: string[];
+  transitions: { [key: string]: Transitions };
+  start_state: string;
+  accepting_states: string[];
+  strings: string;
 }
 
 export default function Soal1() {
@@ -28,20 +38,49 @@ export default function Soal1() {
   const [startState, setStartState] = useState<string>("q0");
   const [final, setFinalState] = useState<string>("q2");
   const [jenisFA, setjenisFA] = useState<string>("nfa");
+  const [svgResponse1, setSvgResponse1] = useState<string>('');
+  const [svgResponse2, setSvgResponse2] = useState<string>('');
   const [transitions, setTransitions] = useState<Transitions>({
     q0: "q0,q1:q0",
     q1: ":q2",
     q2: ":",
   });
-  const [epsilons, setEpsilons] = useState<{[key: string]: string;}>({
+  const [epsilons, setEpsilons] = useState<{ [key: string]: string; }>({
     q0: "q1",
     q1: "q3",
     q2: "q4",
     q3: "",
     q4: "",
   });
-  const [nfa2dfaData, setNfa2dfaData] = useState<NFA2DFADataProps >();
-  const [eNfa2dfaData, setENfa2dfaData] = useState<E_NFA2DFADataProps >();
+
+  const [automata, setAutomata] = useState<Input_Automata>({
+    type: "NFA",
+    states: [],
+    alphabet: [],
+    transitions: {},
+    start_state: "",
+    accepting_states: [],
+    strings: ""
+  });
+
+  const [nfa2dfaData, setNfa2dfaData] = useState<NFA2DFADataProps>();
+  const [eNfa2dfaData, setENfa2dfaData] = useState<E_NFA2DFADataProps>();
+
+  const handleChange = async () => {
+    try {
+      const requestOptions: RequestInit = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(automata)
+      };
+      const res = await fetch('http://localhost:5000/draw_diagram', requestOptions);
+      const data = await res.json();
+      setSvgResponse1(data.svgResult);
+      console.log(automata)
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   const handleStateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newStates = event.target.value;
@@ -53,7 +92,7 @@ export default function Soal1() {
     });
     setTransitions(newTransitions);
   };
- 
+
   const handleAlphabetsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAlphabets(event.target.value);
   };
@@ -61,7 +100,7 @@ export default function Soal1() {
   const handleStartChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setStartState(event.target.value);
   };
-  
+
   const handleFinalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFinalState(event.target.value);
   };
@@ -104,6 +143,8 @@ export default function Soal1() {
       setENfa2dfaData(result);
     }
   };
+
+
   return (
     <main>
       <header className="py-5 px-5">
@@ -111,15 +152,15 @@ export default function Soal1() {
       </header>
 
 
-        <div id='head' className="mt-6 px-9 space-y-4">
+      <div id='head' className="mt-6 px-9 space-y-4">
         <Bsoal1 />
-          <h1 className="font-bold text-3xl mt-4" style={{ fontSize: '2.2em' }}>
-            NFA e-NFA to DFA
-          </h1>
-          <p style={{ fontSize: '0.92em' }}>
-            Menerima input untuk NFA ataupun e-NFA kemudian mengubahnya menjadi DFA yang berkaitan
-          </p>
-        </div>
+        <h1 className="font-bold text-3xl mt-4" style={{ fontSize: '2.2em' }}>
+          NFA e-NFA to DFA
+        </h1>
+        <p style={{ fontSize: '0.92em' }}>
+          Menerima input untuk NFA ataupun e-NFA kemudian mengubahnya menjadi DFA yang berkaitan
+        </p>
+      </div>
       <div id='container' className="mx-left px-9 max-w-[950px] py-1 mt-1">
 
         <div className="flex ">
@@ -162,9 +203,9 @@ export default function Soal1() {
                 />
               </div>
               <div className="mt-1 space-y-2">
-                <Label htmlFor="automataType"className="jenisFA">Jenis Finite Automata</Label>
+                <Label htmlFor="automataType" className="jenisFA">Jenis Finite Automata</Label>
                 <Select defaultValue={jenisFA} onValueChange={(v) => setjenisFA(v)}>
-                  <DropdownMenuDemo/>
+                  <DropdownMenuDemo />
                 </Select>
               </div>
               <div className="mt-8 px-1 py-5">
@@ -189,12 +230,12 @@ export default function Soal1() {
             </div>
 
           </div>
-            <div className="mx-left max-w-[300px]" style={{ marginLeft: '60px' }}>
-              {jenisFA === "nfa" && nfa2dfaData && (
-                <ComponentTableNFA {...nfa2dfaData} />
-              )}
+          <div className="mx-left max-w-[300px]" style={{ marginLeft: '60px' }}>
+            {jenisFA === "nfa" && nfa2dfaData && (
+              <ComponentTableNFA {...nfa2dfaData} />
+            )}
 
-            </div>
+          </div>
         </div>
 
       </div>

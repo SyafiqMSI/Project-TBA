@@ -31,7 +31,7 @@ export function CardWithForm() {
               </CardHeader>
             </Card>
           </Link>
-          <Link href="/soal1">
+          <Link href="/soal2">
             <Card style={cardStyle}>
               <CardHeader>
                 <CardTitle>Regular Expression</CardTitle>

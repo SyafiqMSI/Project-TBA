@@ -1,6 +1,5 @@
 import { NavigationMenuDemo } from "@/components/Nav"
 import { CardWithForm } from "@/components/Card";
-import { ModeToggle } from "@/components/Theme"
 
 export default function Home() {
   return (
