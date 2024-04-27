@@ -16,11 +16,12 @@ interface Transitions {
 }
 
 export default function Soal1() {
+    const [regex, setRegex] = useState<string>("0+1*");
     const [states, setStates] = useState<string>("q0,q1,q2");
     const [alphabets, setAlphabets] = useState<string>("0,1");
     const [startState, setStartState] = useState<string>("q0");
     const [final, setFinalState] = useState<string>("q2");
-    const [jenisFA, setjenisFA] = useState<string>("nfa");
+    const [jenisFA5, setjenisFA] = useState<string>("nfa");
     const [transitions, setTransitions] = useState<Transitions>({
         q0: "q0,q1:q0",
         q1: ":q2",
@@ -90,67 +91,219 @@ export default function Soal1() {
                         Mengetes DFA, NFA, e-NFA ataupun reguler expression dengan memasukkan input berupa string untuk mengetahui apakah string tersebut di accept atau di reject
                     </p>
                 </div>
-
-                <div className="mt-5 space-y-2">
-                    <Label htmlFor="states" className="states">States</Label>
-                    <Input
-                        type="text"
-                        placeholder="q0,q1,..."
-                        defaultValue={states}
-                        onChange={handleStateChange}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="alphabets" className="alphabets">Alphabets</Label>
-                    <Input
-                        type="text"
-                        placeholder="0,1,..."
-                        defaultValue={alphabets}
-                        onChange={handleAlphabetsChange}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="startState" className="startState" >Start State</Label>
-                    <Input
-                        type="text"
-                        placeholder="q0/q1/..."
-                        value={startState}
-                        onChange={handleStartChange}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="finalStates" >Final States</Label>
-                    <Input
-                        type="text"
-                        placeholder="q0/q1/..."
-                        value={final}
-                        onChange={handleFinalChange}
-                    />
-                </div>
-                <div className="mt-4 space-y-2 ">
-                    {Object.entries(transitions).map(([state, value], index) => (
-                        <div key={index} className="space-y-2">
-                            <Label htmlFor={state} className="Transitions" >Transitions {state} untuk {alphabets}</Label>
-                            <Input
-                                type="text"
-                                name={state}
-                                value={value}
-                                onChange={(e) => handleTransitionChange(state, e)}
-                            />
+                {jenisFA5 === "nfa" && (
+                    <>
+                        <div>
+                            <div className="mt-5 space-y-2">
+                                <Label htmlFor="states" className="states">States</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="q0,q1,..."
+                                    defaultValue={states}
+                                    onChange={handleStateChange}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="alphabets" className="alphabets">Alphabets</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="0,1,..."
+                                    defaultValue={alphabets}
+                                    onChange={handleAlphabetsChange}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="startState" className="startState" >Start State</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="q0/q1/..."
+                                    value={startState}
+                                    onChange={handleStartChange}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="finalStates" >Final States</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="q0/q1/..."
+                                    value={final}
+                                    onChange={handleFinalChange}
+                                />
+                            </div>
+                            <div className="mt-4 space-y-2 ">
+                                {Object.entries(transitions).map(([state, value], index) => (
+                                    <div key={index} className="space-y-2">
+                                        <Label htmlFor={state} className="Transitions" >Transitions {state} untuk {alphabets}</Label>
+                                        <Input
+                                            type="text"
+                                            name={state}
+                                            value={value}
+                                            onChange={(e) => handleTransitionChange(state, e)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    ))}
-                </div>
+                    </>
+                )}
+
+                {jenisFA5 === "dfa" && (
+                    <>
+                        <div>
+                            <div className="mt-5 space-y-2">
+                                <Label htmlFor="states" className="states">States</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="q0,q1,..."
+                                    defaultValue={states}
+                                    onChange={handleStateChange}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="alphabets" className="alphabets">Alphabets</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="0,1,..."
+                                    defaultValue={alphabets}
+                                    onChange={handleAlphabetsChange}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="startState" className="startState" >Start State</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="q0/q1/..."
+                                    value={startState}
+                                    onChange={handleStartChange}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="finalStates" >Final States</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="q0/q1/..."
+                                    value={final}
+                                    onChange={handleFinalChange}
+                                />
+                            </div>
+                            <div className="mt-4 space-y-2 ">
+                                {Object.entries(transitions).map(([state, value], index) => (
+                                    <div key={index} className="space-y-2">
+                                        <Label htmlFor={state} className="Transitions" >Transitions {state} untuk {alphabets}</Label>
+                                        <Input
+                                            type="text"
+                                            name={state}
+                                            value={value}
+                                            onChange={(e) => handleTransitionChange(state, e)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {jenisFA5 === "regex" && (
+                    <>
+                        <div>
+                            <div className="mt-5 space-y-2">
+                                <Label htmlFor="regex" className="regex">REGEX</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="1*"
+                                    defaultValue={regex}
+                                    onChange={handleStateChange}
+                                />
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {jenisFA5 === "e-nfa" && (
+                    <>
+                        <div>
+                            <div className="mt-5 space-y-2">
+                                <Label htmlFor="states" className="states">States</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="q0,q1,..."
+                                    defaultValue={states}
+                                    onChange={handleStateChange}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="alphabets" className="alphabets">Alphabets</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="0,1,..."
+                                    defaultValue={alphabets}
+                                    onChange={handleAlphabetsChange}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="startState" className="startState" >Start State</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="q0/q1/..."
+                                    value={startState}
+                                    onChange={handleStartChange}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="finalStates" >Final States</Label>
+                                <Input
+                                    type="text"
+                                    placeholder="q0/q1/..."
+                                    value={final}
+                                    onChange={handleFinalChange}
+                                />
+                            </div>
+                            <div className="mt-4 space-y-2 ">
+                                {Object.entries(transitions).map(([state, value], index) => (
+                                    <div key={index} className="space-y-2">
+                                        <Label htmlFor={state} className="Transitions" >Transitions {state} untuk {alphabets}</Label>
+                                        <Input
+                                            type="text"
+                                            name={state}
+                                            value={value}
+                                            onChange={(e) => handleTransitionChange(state, e)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                            <div>
+                                <p className="text-lg font-semibold pt-4">Epsilon</p>
+                                <p>Pisahkan setiap state menggunakan tanda koma (,)</p>
+                            </div>
+                            <div className="gap-2">
+                                {states.split(",").map((item, index) => (
+                                    <div className="space-y-1" key={"input-epsilon-" + index}>
+                                        <Label>Masukkan epsilon ({item})</Label>
+                                        <Input
+                                            placeholder="0,1,..."
+                                            value={epsilons[item]}
+                                            onChange={(e) =>
+                                                setEpsilons({
+                                                    ...epsilons,
+                                                    [item]: e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
                 <div className="mt-1 space-y-2">
-                <Label htmlFor="automataType" className="jenisFA">Jenis Finite Automata</Label>
-                <Select defaultValue={jenisFA} onValueChange={(v) => setjenisFA(v)}>
-                  <SelectFA5 />
-                </Select>
+                    <Label htmlFor="automataType" className="jenisFA">Jenis Finite Automata</Label>
+                    <Select defaultValue={jenisFA5} onValueChange={(v) => setjenisFA(v)}>
+                        <SelectFA5 />
+                    </Select>
                 </div>
                 <div className="mt-8 px-1 py-5">
                     <Button onClick={onClickButtonGenerate}>Test</Button>
                 </div>
-
-
             </div>
         </main>
     );
