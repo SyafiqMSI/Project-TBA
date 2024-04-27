@@ -4,29 +4,26 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu";
+
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from "@/components/ui/select";
+
   
   export function DropdownMenuDemo() {
     return (
-      <div className="mx-auto max-w-[768px] py-3 mt-1">
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <div className="bg-gray-100 px-4 py-2 rounded-md cursor-pointer focus:outline-none">
-              Pilih Jenis Finite Automata
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem>
-              <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left focus:outline-none">
-                Epsilon NFA
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left focus:outline-none">
-                NFA
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div>
+        <SelectTrigger>
+          <SelectValue placeholder="Jenis finite automata" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="nfa">NFA</SelectItem>
+          <SelectItem value="e-nfa">Epsilon NFA</SelectItem>
+        </SelectContent>
       </div>
     );
   }

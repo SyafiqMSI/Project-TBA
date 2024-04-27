@@ -20,11 +20,6 @@ export default function TableNFA({
     <>
       <p className="text-2xl font-semibold mt-8">Conversion Table</p>
 
-      <p className="mt-2">
-        Berikut tabel nondeterministic finite automata berdasarkan masukan yang
-        diberikan sebelum dilakukan konversi
-      </p>
-
       <Table className="mt-4">
         <TableHeader>
           <TableRow>
@@ -64,10 +59,7 @@ export default function TableNFA({
       </Table>
         
       <p className="text-2xl font-semibold mt-8">Tabel DFA</p>
-      <p className="mt-4">
-        Berikut tabel hasil konversi dari nondeterministic finite automata
-        menjadi deterministic finite automata
-      </p>
+
       <Table className="mt-4">
         <TableHeader>
           <TableRow>

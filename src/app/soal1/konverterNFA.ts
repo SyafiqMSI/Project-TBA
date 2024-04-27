@@ -22,20 +22,20 @@ import {
       };
     } = {};
   
-    for (const transition of Object.entries(input.transitions)) {
-      const key = transition[0].toLowerCase();
-      const value = transition[1].toLowerCase();
+    for (const [key, value] of Object.entries(input.transitions)) {
+      const lowercaseKey = key.toLowerCase();
+      const lowercaseValue = value.toLowerCase();
   
       const innerTransitions: { [key: string]: string[] } = {};
   
-      const statesByAlphabet = value.split(":");
+      const statesByAlphabet = lowercaseValue.split(":");
       for (let a = 0; a < alphabets.length; a++) {
         const alphabet = alphabets[a];
         if (statesByAlphabet[a].length > 0)
           innerTransitions[alphabet] = statesByAlphabet[a].split(",");
       }
   
-      transitions[key] = innerTransitions;
+      transitions[lowercaseKey] = innerTransitions;
     }
   
     return {

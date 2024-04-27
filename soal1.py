@@ -1,3 +1,5 @@
+
+
 class NFA:
     def __init__(self, states, alphabet, transitions, start_state, accept_states):
         self.states = states
