@@ -8,6 +8,7 @@
   .startState,
   .finalState,
   .jenisFA,
+  .epsilon,
   .Transitions {
     font-size: 13px;
   }
