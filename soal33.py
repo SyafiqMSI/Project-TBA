@@ -57,13 +57,15 @@ def minimize_dfa(transitions, final_states):
     for state in transitions.keys():
         group = None
         for other_state in groups.keys():
-            if equivalent[(state, other_state)]:
-                group = other_state
-                break
+            if (state, other_state) in equivalent:  # memastikan bahwa setiap akses ke dictionary equivalent dilakukan pada pasangan state yang benar-benar ada dalam equivalent
+                if equivalent[(state, other_state)]:
+                    group = other_state
+                    break
         if group is None:
             groups[state] = state
         else:
             groups[state] = group
+
     
     # Membangun DFA minimal
     minimal_transitions = {}
