@@ -38,7 +38,7 @@ export function Bsoal2() {
             <Slash />
           </BreadcrumbSeparator>
           <BreadcrumbItem>
-            <BreadcrumbPage>Regular Expression</BreadcrumbPage>
+            <BreadcrumbPage>Regular Expression to e-NFA</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -56,7 +56,7 @@ export function Bsoal3() {
             <Slash />
           </BreadcrumbSeparator>
           <BreadcrumbItem>
-            <BreadcrumbPage>Regular Expression</BreadcrumbPage>
+            <BreadcrumbPage>DFA Minimization</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -74,7 +74,7 @@ export function Bsoal4() {
             <Slash />
           </BreadcrumbSeparator>
           <BreadcrumbItem>
-            <BreadcrumbPage>Regular Expression</BreadcrumbPage>
+            <BreadcrumbPage>DFA Equivalence</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -92,7 +92,7 @@ export function Bsoal5() {
             <Slash />
           </BreadcrumbSeparator>
           <BreadcrumbItem>
-            <BreadcrumbPage>Regular Expression</BreadcrumbPage>
+            <BreadcrumbPage>Tester</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

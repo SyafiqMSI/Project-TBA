@@ -134,10 +134,10 @@ export default function Soal4() {
                 <Bsoal4 />
                 <div className="mt-8 space-y-4">
                     <h1 className="font-bold text-3xl mt-4" style={{ fontSize: '2.3em' }}>
-                        NFA e-NFA to DFA
+                        DFA Equivalence
                     </h1>
                     <p style={{ fontSize: '1.0em' }}>
-                        Menerima input untuk NFA ataupun e-NFA kemudian mengubahnya menjadi DFA yang berkaitan
+                        Menerima input berupa dua buah DFA, kemudian menunjukkan keduanya equivalen atau tidak
                     </p>
                 </div>
 
