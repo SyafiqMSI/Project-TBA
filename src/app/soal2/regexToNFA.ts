@@ -212,7 +212,7 @@ function printStateTransitions(
     if (transitionsOutput.length > 0) {
         console.log(`${stateLabel}\t\t\t${transitionsOutput.join(" | ")}`);
     } else {
-        console.log(`${stateLabel}\t\t\t-\t\t\t\t-`);
+        console.log(`\*${stateLabel}\t\t\t-\t\t\t\t-`);
     }
 
     // Recursive call to next states, handling each transition array properly
