@@ -1,11 +1,13 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NavigationMenuDemo } from '@/components/Nav';
 import { Bsoal3 } from '@/components/Bread';
 import { minimizeDFA, simulateDFA, DFA } from './minimasi';
+import TableDFA from './tableDFA'; // Import komponen TableDFA
+import TableDFAMinimasi from './tableDFAminimasi'; // Import komponen TableDFAMinimasi
 import "./style.css";
 
 import { Button } from '@/components/ui/button';
@@ -187,6 +189,25 @@ export default function Soal3() {
                     {dfaDisplay && <div>Minimized DFA: {JSON.stringify(dfaDisplay)}</div>}
                     {testResult !== null && <div>Test Result: {testResult ? 'Accepted' : 'Rejected'}</div>}
                 </div>
+                
+                {/* Memanggil komponen TableDFA */}
+                <TableDFA
+                    states={states.split(',')}
+                    alphabets={alphabets.split(',')}
+                    startState={startState}
+                    finalStates={final.split(',')}
+                    transitions={transitions}
+                />
+
+                {/* Memanggil komponen TableDFAMinimasi */}
+                {/* Anda bisa melewatkan props yang sesuai */}
+                {/* <TableDFAMinimasi
+                    states={states.split(',')}
+                    alphabets={alphabets.split(',')}
+                    startState={startState}
+                    finalStates={final.split(',')}
+                    transitions={transitions}
+                /> */}
             </div>
         </main>
     );
