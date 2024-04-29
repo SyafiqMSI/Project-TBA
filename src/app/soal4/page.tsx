@@ -217,7 +217,7 @@ export default function Soal4() {
                 </div>
               ))}
             </div>
-            <div className="mt-8 py-7">
+            <div className="py-8">
               <Button onClick={onClickButtonGenerate}>Cek Ekuivalen</Button>
             </div>
           </div>
