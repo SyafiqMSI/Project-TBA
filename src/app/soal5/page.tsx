@@ -15,7 +15,7 @@ interface Transitions {
     [key: string]: string;
 }
 
-export default function Soal1() {
+export default function Soal5() {
     const [regex, setRegex] = useState<string>("0+1*");
     const [states, setStates] = useState<string>("q0,q1,q2");
     const [alphabets, setAlphabets] = useState<string>("0,1");
