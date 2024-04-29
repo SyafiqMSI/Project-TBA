@@ -71,7 +71,17 @@ export default function Soal1() {
     };
 
     const onClickButtonGenerate = () => {
-
+        if (jenisFA5 === "nfa") {
+         
+        } else if (jenisFA5 === "dfa") {
+        
+        } else if (jenisFA5 === "e-nfa") {
+        
+        } else if (jenisFA5 === "regex") {
+        
+        } else {
+            alert("Automata tidak ditemukan");
+        }
     };
 
 
@@ -273,7 +283,6 @@ export default function Soal1() {
                             </div>
                             <div>
                                 <p className="text-lg font-semibold pt-4">Epsilon</p>
-                                <p>Pisahkan setiap state menggunakan tanda koma (,)</p>
                             </div>
                             <div className="gap-2">
                                 {states.split(",").map((item, index) => (
