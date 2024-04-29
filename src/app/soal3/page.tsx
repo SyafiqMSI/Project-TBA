@@ -17,22 +17,28 @@ interface Transitions {
 }
 
 export default function Soal3() {
-    const [states, setStates] = useState<string>("q0,q1,q2,q3,q4");
+    const [states, setStates] = useState<string>("q0,q1,q2,q3,q4,q5,q6,q7");
     const [alphabets, setAlphabets] = useState<string>("0,1");
     const [startState, setStartState] = useState<string>("q0");
-    const [final, setFinalState] = useState<string>("q3");
-    const [string, setString] = useState<string>("0001");
+    const [final, setFinalState] = useState<string>("q4");
+    const [string, setString] = useState<string>("0111");
     const [transitions, setTransitions] = useState<Transitions>({
-        "q0,0": "q1",
-        "q0,1": "q2",
-        "q1,0": "q1",
+        "q0,0": "q2",
+        "q0,1": "q3",
+        "q1,0": "q7",
         "q1,1": "q3",
-        "q2,0": "q1",
-        "q2,1": "q2",
-        "q3,0": "q1",
-        "q3,1": "q4",
-        "q4,0": "q1",
-        "q4,1": "q2",
+        "q2,0": "q5",
+        "q2,1": "q4",
+        "q3,0": "q4",
+        "q3,1": "q5",
+        "q4,0": "q0",
+        "q4,1": "q4",
+        "q5,0": "q5",
+        "q5,1": "q1",
+        "q6,0": "q4",
+        "q6,1": "q5",
+        "q7,0": "q5",
+        "q7,1": "q4",
     });
 
     const [minimizedStates, setMinimizedStates] = useState(states);
