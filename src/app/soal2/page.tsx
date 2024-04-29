@@ -22,11 +22,15 @@ export default function Soal2() {
     };
 
     const onClickButtonGenerate = () => {
-        const pr = postfix(regex);
-        const et = constructTree(pr);
-        const fa = evalRegex(et);
-
-        printTransitionTable(fa);
+        try {
+            const postfixed = postfix(regex);
+            const expressionTree = constructTree(postfixed);
+            const [startState, finalState] = evalRegex(expressionTree);
+            console.log('E-NFA transition table:');
+            printTransitionTable([startState, finalState]);
+        } catch (error) {
+            console.error("Error processing regex:", error);
+        }
     };
 
     return (

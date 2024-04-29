@@ -1,8 +1,10 @@
-class Type {
-    static SYMBOL = 1;
-    static CONCAT = 2;
-    static UNION = 3;
-    static KLEENE = 4;
+// regexToENFA.ts
+
+enum Type {
+    SYMBOL = 1,
+    CONCAT = 2,
+    UNION = 3,
+    KLEENE = 4
 }
 
 class ExpressionTree {
@@ -11,135 +13,114 @@ class ExpressionTree {
     left: ExpressionTree | null;
     right: ExpressionTree | null;
 
-    constructor(_type: number, value: string | null = null) {
+    constructor(_type: number, value: string | null = null, left: ExpressionTree | null = null, right: ExpressionTree | null = null) {
         this._type = _type;
         this.value = value;
-        this.left = null;
-        this.right = null;
+        this.left = left;
+        this.right = right;
     }
 }
 
-function constructTree(regexp: string): ExpressionTree {
-    const stack: ExpressionTree[] = [];
-    for (const c of regexp) {
-        let z: ExpressionTree | null = null;
-        if (c.match(/[a-zA-Z]/)) {
-            stack.push(new ExpressionTree(Type.SYMBOL, c));
-        } else {
-            if (c === "+") {
-                z = new ExpressionTree(Type.UNION);
-                z.right = stack.pop()!;
-                z.left = stack.pop()!;
-            } else if (c === ".") {
-                z = new ExpressionTree(Type.CONCAT);
-                z.right = stack.pop()!;
-                z.left = stack.pop()!;
-            } else if (c === "*") {
-                z = new ExpressionTree(Type.KLEENE);
-                z.left = stack.pop()!;
+const precedence: { [key: string]: number } = { '+': 1, '.': 2, '*': 3 };
+
+function postfix(regexp: string): string {
+    const output: string[] = [];
+    const stack: string[] = [];
+
+    const input = regexp.split('').reduce((acc, cur, index, array) => {
+        acc.push(cur);
+        if (cur.match(/[a-zA-Z0-9]/) || cur === '*' || cur === ')') {
+            if (index + 1 < array.length && (array[index + 1].match(/[a-zA-Z0-9]/) || array[index + 1] === '(')) {
+                acc.push('.');
             }
-            if (z !== null) {
-                stack.push(z);
+        }
+        return acc;
+    }, [] as string[]).join('');
+
+    for (const token of input) {
+        if (token.match(/[a-zA-Z0-9]/)) {
+            output.push(token);
+        } else if (token === '(') {
+            stack.push(token);
+        } else if (token === ')') {
+            while (stack.length && stack[stack.length - 1] !== '(') {
+                output.push(stack.pop()!);
+            }
+            stack.pop();
+        } else {
+            while (stack.length && precedence[token] <= precedence[stack[stack.length - 1]]) {
+                output.push(stack.pop()!);
+            }
+            stack.push(token);
+        }
+    }
+
+    while (stack.length) {
+        output.push(stack.pop()!);
+    }
+
+    return output.join('');
+}
+
+function constructTree(postfix: string): ExpressionTree {
+    const stack: ExpressionTree[] = [];
+
+    for (const char of postfix) {
+        if (char.match(/[a-zA-Z0-9]/)) {
+            stack.push(new ExpressionTree(Type.SYMBOL, char));
+        } else {
+            if (char === '*') {
+                const node = new ExpressionTree(Type.KLEENE);
+                node.left = stack.pop()!;
+                stack.push(node);
             } else {
-                throw new Error("Invalid regular expression");
+                const right = stack.pop()!;
+                const left = stack.pop()!;
+                if (char === '.') {
+                    stack.push(new ExpressionTree(Type.CONCAT, null, left, right));
+                } else if (char === '+') {
+                    stack.push(new ExpressionTree(Type.UNION, null, left, right));
+                }
             }
         }
     }
-    if (stack.length !== 1) {
-        throw new Error("Invalid regular expression");
-    }
+
+    if (stack.length !== 1) throw new Error("Invalid postfix expression");
     return stack[0];
 }
 
-
-function inorder(et: ExpressionTree): void {
-    if (et._type === Type.SYMBOL) {
-        console.log(et.value);
-    } else if (et._type === Type.CONCAT) {
-        inorder(et.left!);
-        console.log(".");
-        inorder(et.right!);
-    } else if (et._type === Type.UNION) {
-        inorder(et.left!);
-        console.log("+");
-        inorder(et.right!);
-    } else if (et._type === Type.KLEENE) {
-        inorder(et.left!);
-        console.log("*");
-    }
-}
-
-function higherPrecedence(a: string, b: string): boolean {
-    const p = ["+", ".", "*"];
-    return p.indexOf(a) > p.indexOf(b);
-}
-
-function postfix(regexp: string): string {
-    const temp: string[] = [];
-    for (let i = 0; i < regexp.length; i++) {
-        if (i !== 0 &&
-            (regexp[i - 1].match(/[a-zA-Z]/) || regexp[i - 1] === ")" || regexp[i - 1] === "*") &&
-            (regexp[i].match(/[a-zA-Z]/) || regexp[i] === "(")) {
-            temp.push(".");
-        }
-        temp.push(regexp[i]);
-    }
-    regexp = temp.join('');
-
-    const stack: string[] = [];
-    let output = "";
-
-    for (const c of regexp) {
-        if (c.match(/[a-zA-Z]/)) {
-            output += c;
-            continue;
-        }
-
-        if (c === ")") {
-            while (stack.length !== 0 && stack[stack.length - 1] !== "(") {
-                output += stack.pop()!;
-            }
-            stack.pop();
-        } else if (c === "(") {
-            stack.push(c);
-        } else if (c === "*") {
-            output += c;
-        } else if (stack.length === 0 || stack[stack.length - 1] === "(" || higherPrecedence(c, stack[stack.length - 1])) {
-            stack.push(c);
-        } else {
-            while (stack.length !== 0 && stack[stack.length - 1] !== "(" && !higherPrecedence(c, stack[stack.length - 1])) {
-                output += stack.pop()!;
-            }
-            stack.push(c);
-        }
-    }
-
-    while (stack.length !== 0) {
-        output += stack.pop()!;
-    }
-
-    return output;
-}
-
 class FiniteAutomataState {
+    id: number; // This will be used to give each state a unique identifier.
     next_state: { [key: string]: FiniteAutomataState[] };
 
     constructor() {
+        this.id = FiniteAutomataState.id++;
         this.next_state = {};
     }
+
+    static id = 0; // Static counter to assign unique IDs
 }
 
 function evalRegex(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
-    if (et._type === Type.SYMBOL) {
-        return evalRegexSymbol(et);
-    } else if (et._type === Type.CONCAT) {
-        return evalRegexConcat(et);
-    } else if (et._type === Type.UNION) {
-        return evalRegexUnion(et);
-    } else if (et._type === Type.KLEENE) {
-        return evalRegexKleene(et);
+    console.log(`Evaluating: Type = ${et._type}, Value = ${et.value}`);
+    switch (et._type) {
+        case Type.SYMBOL:
+            return evalRegexSymbol(et);
+        case Type.CONCAT:
+            const concatResult = evalRegexConcat(et);
+            console.log(`Concat result: Start = ${concatResult[0].id}, End = ${concatResult[1].id}`);
+            return concatResult;
+        case Type.UNION:
+            const unionResult = evalRegexUnion(et);
+            console.log(`Union result: Start = ${unionResult[0].id}, End = ${unionResult[1].id}`);
+            return unionResult;
+        case Type.KLEENE:
+            const kleeneResult = evalRegexKleene(et);
+            console.log(`Kleene result: Start = ${kleeneResult[0].id}, End = ${kleeneResult[1].id}`);
+            return kleeneResult;
+        default:
+            throw new Error("Invalid expression tree type");
     }
-    throw new Error("Invalid expression tree type");
 }
 
 function evalRegexSymbol(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
@@ -151,23 +132,30 @@ function evalRegexSymbol(et: ExpressionTree): [FiniteAutomataState, FiniteAutoma
 }
 
 function evalRegexConcat(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
-    const left_nfa = evalRegex(et.left!);
-    const right_nfa = evalRegex(et.right!);
+    const [leftStart, leftEnd] = evalRegex(et.left!);
+    const [rightStart, rightEnd] = evalRegex(et.right!);
 
-    left_nfa[1].next_state['epsilon'] = [right_nfa[0]];
-    return [left_nfa[0], right_nfa[1]];
+    // Connect the end of the first NFA to the start of the second NFA directly without an epsilon if needed
+    leftEnd.next_state['epsilon'] = leftEnd.next_state['epsilon'] || [];
+    leftEnd.next_state['epsilon'].push(rightStart);
+
+    return [leftStart, rightEnd];
 }
 
 function evalRegexUnion(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
     const start_state = new FiniteAutomataState();
     const end_state = new FiniteAutomataState();
+    const [leftStart, leftEnd] = evalRegex(et.left!);
+    const [rightStart, rightEnd] = evalRegex(et.right!);
 
-    const up_nfa = evalRegex(et.left!);
-    const down_nfa = evalRegex(et.right!);
+    // Ensure the start state has epsilon transitions to both NFA starts
+    start_state.next_state['epsilon'] = [leftStart, rightStart];
 
-    start_state.next_state['epsilon'] = [up_nfa[0], down_nfa[0]];
-    up_nfa[1].next_state['epsilon'] = [end_state];
-    down_nfa[1].next_state['epsilon'] = [end_state];
+    // Ensure both NFA ends have transitions to the new end state
+    leftEnd.next_state['epsilon'] = leftEnd.next_state['epsilon'] || [];
+    leftEnd.next_state['epsilon'].push(end_state);
+    rightEnd.next_state['epsilon'] = rightEnd.next_state['epsilon'] || [];
+    rightEnd.next_state['epsilon'].push(end_state);
 
     return [start_state, end_state];
 }
@@ -175,83 +163,88 @@ function evalRegexUnion(et: ExpressionTree): [FiniteAutomataState, FiniteAutomat
 function evalRegexKleene(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
     const start_state = new FiniteAutomataState();
     const end_state = new FiniteAutomataState();
+    const [subStart, subEnd] = evalRegex(et.left!);
 
-    const sub_nfa = evalRegex(et.left!);
+    // Start state should have an epsilon transition to the sub-automata start and directly to the end state
+    start_state.next_state['epsilon'] = [subStart, end_state];
 
-    start_state.next_state['epsilon'] = [sub_nfa[0], end_state];
-    sub_nfa[1].next_state['epsilon'] = [sub_nfa[0], end_state];
+    // Sub-automata end should loop back to its start and also to the end state
+    subEnd.next_state['epsilon'] = subEnd.next_state['epsilon'] || [];
+    subEnd.next_state['epsilon'].push(subStart, end_state);
 
     return [start_state, end_state];
 }
 
-function printStateTransitions(state: FiniteAutomataState, states_done: FiniteAutomataState[], symbol_table: { [key: string]: number }, final_states: Set<FiniteAutomataState>): void {
-    if (states_done.includes(state)) {
-        return;
+
+
+function printStateTransitions(state: FiniteAutomataState, statesDone: Set<FiniteAutomataState>, stateMapping: Map<FiniteAutomataState, string>): void {
+    if (statesDone.has(state)) return;
+    statesDone.add(state);
+
+    // Ensuring each state has a unique label
+    if (!stateMapping.has(state)) {
+        stateMapping.set(state, `q${state.id}`);
     }
 
-    states_done.push(state);
-
-    let state_label = "q" + symbol_table[state.toString()];
-    if (final_states.has(state)) {
-        state_label += "*";
-    }
-    console.log(state_label + "\t\t");
-
-    const transitions: { [key: string]: boolean } = {};
+    const stateLabel = stateMapping.get(state);
 
     for (const symbol in state.next_state) {
-        const next_states = state.next_state[symbol];
-        const next_state_labels: string[] = [];
-        for (const ns of next_states) {
-            if (!(ns.toString() in symbol_table)) {
-                symbol_table[ns.toString()] = Object.keys(symbol_table).length;
+        const transitions = state.next_state[symbol];
+        for (const nextState of transitions) {
+            if (!stateMapping.has(nextState)) {
+                stateMapping.set(nextState, `q${nextState.id}`);
             }
-            let next_state_label = "q" + symbol_table[ns.toString()];
-            if (final_states.has(ns)) {
-                next_state_label += "*";
-            }
-            next_state_labels.push(next_state_label);
-        }
-
-        const transition_key = symbol + "\t\t" + next_state_labels.join(", ");
-        transitions[transition_key] = true;
-    }
-
-    for (const transition_key in transitions) {
-        console.log(transition_key);
-    }
-
-    if (Object.keys(state.next_state).length === 0) {
-        console.log("-\t\t-");
-    }
-
-    for (const ns of Object.values(state.next_state)) {
-        for (const next_state of ns) {
-            printStateTransitions(next_state, states_done, symbol_table, final_states);
+            const nextStateLabel = stateMapping.get(nextState);
+            console.log(`${stateLabel} --${symbol}--> ${nextStateLabel}`);
+            printStateTransitions(nextState, statesDone, stateMapping);
         }
     }
 }
 
-function printTransitionTable(finite_automata: [FiniteAutomataState, FiniteAutomataState]): void {
+function printTransitionTable(finiteAutomata: [FiniteAutomataState, FiniteAutomataState]): void {
     console.log("State\t\tSymbol\t\tNext state");
-    const start_state = finite_automata[0];
-    const final_state = finite_automata[1];
-    const final_states = new Set([final_state]);
-    printStateTransitions(start_state, [], { [start_state.toString()]: 0 }, final_states);
+    const [startState, finalState] = finiteAutomata;
+    const stateMapping = new Map<FiniteAutomataState, string>();
+    const statesDone = new Set<FiniteAutomataState>();
+
+    printStateTransitions(startState, statesDone, stateMapping);
 }
-
-function generate_transition_table(): void {
-    const regexp = prompt("Enter regex: ")!;
-    const pr = postfix(regexp);
-    const et = constructTree(pr);
-    const fa = evalRegex(et);
-    printTransitionTable(fa);
-}
-
-generate_transition_table();
-
-
-
-
 
 export { postfix, constructTree, evalRegex, printTransitionTable, FiniteAutomataState, ExpressionTree };
+
+
+
+// State		Symbol		Next state
+// q0 --epsilon--> q2
+// q2 --epsilon--> q4
+// q4 --a--> q5
+// q5 --epsilon--> q3
+// q3 --epsilon--> q2
+// q3 --epsilon--> q1
+// q1 --epsilon--> q8
+// q8 --a--> q9
+// q9 --epsilon--> q10
+// q10 --b--> q11
+// q11 --epsilon--> q12
+// q12 --b--> q13
+// q2 --epsilon--> q6
+// q6 --b--> q7
+// q7 --epsilon--> q3
+// q0 --epsilon--> q1
+
+
+// State		Symbol		Next state
+// q0 --epsilon--> q1,q2
+// q1 --epsilon--> q3,q4
+// q3 --a--> q5
+// q5 --epsilon--> q6
+// q6 --epsilon--> q1,q2
+// q2 --epsilon--> q7
+// q7 --a--> q8
+// q8 --epsilon--> q9
+// q9 --b--> q10
+// q10 --epsilon--> q11
+// q11 --b--> q12*
+// q12* -- - --> -
+// q4 --b--> q13
+// q13 --epsilon--> q6
