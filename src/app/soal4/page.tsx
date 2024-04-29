@@ -7,7 +7,7 @@ import { NavigationMenuDemo } from '@/components/Nav';
 import { Bsoal4 } from '@/components/Bread';
 import { Select } from "@/components/ui/select";
 import "./style.css";
-import { areEquivalent, DFA } from './ekuivalensi';
+import { areEquivalent, DFA} from './ekuivalensi';
 
 import { Button } from '@/components/ui/button';
 

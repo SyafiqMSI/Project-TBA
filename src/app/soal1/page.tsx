@@ -162,7 +162,7 @@ export default function Soal1() {
       </div>
       <div id='container' className="mx-left px-9 max-w-[950px] py-1 mt-1">
 
-        <div className="flex ">
+        <div className="gap-2 grid grid-cols-3">
           <div className="mx-left px-1 max-w-[540px] py-1" style={{ marginRight: '20px' }}>
             <div className="mt-1 space-y-2">
               <div className="mt-5 space-y-2">
@@ -213,7 +213,7 @@ export default function Soal1() {
             </div>
           </div>
 
-          <div className="mx-left max-w-[470px] py-2" style={{ marginLeft: '10px' }}>
+          <div className="mx-left max-w-[540px] py-2" style={{ marginLeft: '10px' }}>
             <div className="mt-4 space-y-2 ">
               {Object.entries(transitions).map(([state, value], index) => (
                 <div key={index} className="space-y-2">
@@ -227,45 +227,46 @@ export default function Soal1() {
                 </div>
               ))}
             </div>
-
-            {jenisFA === "e-nfa" && (
-            <>
-              <div>
-                <p className="text-lg font-semibold pt-4">Epsilon</p>
-                <p>Pisahkan setiap state menggunakan tanda koma (,)</p>
-              </div>
-              <div className="gap-2 grid grid-cols-2">
-                {states.split(",").map((item, index) => (
-                  <div className="space-y-1" key={"input-epsilon-" + index}>
-                    <Label>Masukkan epsilon ({item})</Label>
-                    <Input
-                      placeholder="0,1,..."
-                      value={epsilons[item]}
-                      onChange={(e) =>
-                        setEpsilons({
-                          ...epsilons,
-                          [item]: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
           </div>
-          <div className="mx-left max-w-[300px]" style={{ marginLeft: '60px' }}>
+
+          <div className="mx-left max-w-[300px]" style={{ marginLeft: '30px' }}>
             {jenisFA === "nfa" && nfa2dfaData && (
               <ComponentTableNFA {...nfa2dfaData} />
             )}
-             {jenisFA === "e-nfa" && eNfa2dfaData && (
-              <ComponentTableE_NFA {...eNfa2dfaData} />
+
+            {jenisFA === "e-nfa" && (
+              <>
+                <div className="mt-6 space-y-2">
+                  {states.split(",").map((item, index) => (
+                    <div className="space-y-2" key={"input-epsilon-" + index}>
+                      <Label className='epsilon'>Masukkan epsilon ({item})</Label>
+                      <Input
+                        placeholder="0,1,..."
+                        value={epsilons[item]}
+                        onChange={(e) =>
+                          setEpsilons({
+                            ...epsilons,
+                            [item]: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
 
+            <div className="mx-left max-w-[300px]" style={{ marginLeft: '30px' }}>
+              {jenisFA === "nfa" && nfa2dfaData && (
+                <ComponentTableNFA {...nfa2dfaData} />
+              )}
+              {jenisFA === "e-nfa" && eNfa2dfaData && (
+                <ComponentTableE_NFA {...eNfa2dfaData} />
+              )}
+
+            </div>
           </div>
         </div>
-
       </div>
     </main>
   );
