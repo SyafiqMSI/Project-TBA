@@ -3,7 +3,7 @@ import {
     ENFADataProps,
     ENFAInputProps,
   } from "./type";
-  import { nfaConverterRepository } from "./NFAConverter";
+  import { nfaConverterRepository } from "./konverterNFA";
   
   const generateE_NFAData = (input: ENFAInputProps): ENFADataProps => {
     const states = input.states.toLowerCase().split(",");

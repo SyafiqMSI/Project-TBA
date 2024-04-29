@@ -109,10 +109,3 @@ export type E_NFA2DFADataProps = {
     };
     dfaFinalStates: string[];
 };
-
-export type DFATableProps = {
-    [key: string]: {
-        [key: string]: string[];
-    };
-};
-  

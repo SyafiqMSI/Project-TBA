@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ArrowRight } from "lucide-react";
-import { NFA2DFADataProps } from "./type";
+import { NFA2DFADataProps } from "./ts/type";
 
 export default function TableNFA({
   nfaData,
@@ -19,11 +19,6 @@ export default function TableNFA({
   return (
     <>
       <p className="text-2xl font-semibold mt-8">Conversion Table</p>
-
-      <p className="mt-2">
-        Berikut tabel nondeterministic finite automata berdasarkan masukan yang
-        diberikan sebelum dilakukan konversi
-      </p>
 
       <Table className="mt-4">
         <TableHeader>
@@ -64,10 +59,7 @@ export default function TableNFA({
       </Table>
         
       <p className="text-2xl font-semibold mt-8">Tabel DFA</p>
-      <p className="mt-4">
-        Berikut tabel hasil konversi dari nondeterministic finite automata
-        menjadi deterministic finite automata
-      </p>
+
       <Table className="mt-4">
         <TableHeader>
           <TableRow>
