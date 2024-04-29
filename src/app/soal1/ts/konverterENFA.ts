@@ -1,205 +1,116 @@
 import {
-    E_NFA2DFADataProps,
-    ENFADataProps,
-    ENFAInputProps,
-  } from "./type";
-  import { nfaConverterRepository } from "./konverterNFA";
-  
-  const generateE_NFAData = (input: ENFAInputProps): ENFADataProps => {
-    const states = input.states.toLowerCase().split(",");
-    const alphabets = input.alphabets.toLowerCase().split(",");
-    const startState = input.startState.toLowerCase();
-    const finalStates = input.finalStates.toLowerCase().split(",");
-  
-    const transitionsTable: {
-      [key: string]: {
-        [key: string]: string[];
-      };
-    } = {};
-  
-    for (const state of states) {
-      transitionsTable[state] = {};
-      for (const alphabet of alphabets) {
-        transitionsTable[state][alphabet] = [];
-      }
-    }
-  
-    const epsilonTransitions: {
-      [key: string]: string[];
-    } = {};
-  
-    for (const transition of Object.entries(input.transitions)) {
-      const key = transition[0].toLowerCase();
-      const value = transition[1].toLowerCase();
-  
-      const values = value.split(":");
-      let index = 0;
-      for (const alphabet of alphabets) {
-        const strCurrentValues: string = values[index];
-        if (strCurrentValues.length > 0) {
-          transitionsTable[key][alphabet] = strCurrentValues.split(",");
-        }
-  
-        index++;
-      }
-    }
-  
-    console.log("aaa", transitionsTable);
-  
-    // epsilon transitions
-    for (const epsilonTransition of Object.entries(input.epsilons)) {
-      const key = epsilonTransition[0].toLowerCase();
-      const value = epsilonTransition[1].toLowerCase();
-  
-      if (states.includes(key)) {
-        console.log({ key, value });
-  
-        if (value.length > 0) {
-          epsilonTransitions[key] = value.split(",");
-        }
-      }
-    }
-  
-    return {
-      states,
-      alphabets,
-      startState,
-      finalStates,
-      transitions: transitionsTable,
-      epsilonTransitions,
-    };
+  E_NFA2DFADataProps,
+  ENFADataProps,
+  ENFAInputProps,
+  NFAInputProps,
+} from "./type";
+import { nfaConverterRepository } from "./konverterNFA";
+
+type TransitionTable = {
+  [key: string]: {
+    [key: string]: string[];
   };
-  
-  const generateFinalStatesWithClosure = (data: ENFADataProps): string[] => {
-    const newFinalStates: string[] = [...data.finalStates];
-    const tableClosures: {
-      [key: string]: string[];
-    } = {};
-  
-    // initialize empty table closure
-    for (const transition of Object.entries(data.transitions)) {
-      const currentState = transition[0];
-      const epsilonStates = data.epsilonTransitions[currentState];
-  
-      if (epsilonStates && epsilonStates.length > 0) {
-        tableClosures[currentState] = [];
-      }
-    }
-  
-    for (const transition of Object.entries(data.transitions)) {
-      const currentState = transition[0];
-      const epsilonStates = data.epsilonTransitions[currentState];
-  
-      // console.log({ currentState, epsilonStates });
-  
-      if (epsilonStates && epsilonStates.length > 0) {
-        console.log("closure", { currentState, epsilonStates });
-  
-        const closures: string[] = [];
-  
-        let currentEpsilonStates = [currentState, ...epsilonStates];
-        while (currentEpsilonStates.length > 0) {
-          const currentEpsilonState = currentEpsilonStates[0];
-          // const a = data.transitions[currentEpsilonState].epsilon;
-          const a = data.epsilonTransitions[currentEpsilonState];
-  
-          if (a && currentEpsilonState !== currentState) {
-            currentEpsilonStates.push(...a);
-          }
-          closures.push(currentEpsilonStates.splice(0, 1)[0]);
-        }
-  
-        if (closures.includes(currentState)) {
-          newFinalStates.push(currentState);
-        }
-  
-        console.log("closure", { currentState, closures });
-        tableClosures[currentState].push(...closures);
-        tableClosures[currentState].sort();
-      }
-    }
-  
-    console.log("closure", { closureTables: tableClosures });
-  
-    return newFinalStates;
-  };
-  
-  const generateNewTransitions = (data: ENFADataProps) => {
-    const newTransitions: {
-      [key: string]: {
-        [key: string]: string[];
-      };
-    } = {};
-    // const newEpsilonTransitions: {
-    //   [key: string]: string[];
-    // } = {};
-  
-    for (const transition of Object.entries(data.transitions)) {
-      const key = transition[0];
-      const value = transition[1];
-      const currentEpsilonTransitions = data.epsilonTransitions[key];
-  
-      if (currentEpsilonTransitions && currentEpsilonTransitions.length > 0) {
-        for (const epsilon of currentEpsilonTransitions) {
-          const innerNewTransitions: {
-            [key: string]: string[];
-          } = {};
-          // newEpsilonTransitions[key] = currentEpsilonTransitions;
-  
-          for (const alphabet of data.alphabets) {
-            if (data.transitions[key] && data.transitions[key][alphabet])
-              innerNewTransitions[alphabet] = data.transitions[key][alphabet];
-            else innerNewTransitions[alphabet] = [];
-          }
-  
-          const transition = data.transitions[epsilon];
-          for (const alphabet of data.alphabets) {
-            innerNewTransitions[alphabet].push(...transition[alphabet]);
-          }
-  
-          newTransitions[key] = innerNewTransitions;
-        }
-      } else {
-        newTransitions[key] = value;
-      }
-    }
-  
-    console.log({
-      trasitions: data.transitions,
-      newTransitions,
-      // newEpsilonTransitions,
+};
+
+const generateE_NFAData = (input: ENFAInputProps): ENFADataProps => {
+  const states = input.states.toLowerCase().split(",");
+  const alphabets = input.alphabets.toLowerCase().split(",");
+  const startState = input.startState.toLowerCase();
+  const finalStates = input.finalStates.toLowerCase().split(",");
+
+  const transitions: TransitionTable = {};
+  states.forEach(state => {
+    transitions[state] = {};
+    alphabets.forEach(alphabet => {
+      transitions[state][alphabet] = [];
     });
-  
-    return newTransitions;
+  });
+
+  Object.entries(input.transitions).forEach(([key, value]) => {
+    const splitValues = value.toLowerCase().split(':');
+    alphabets.forEach((alphabet, index) => {
+      transitions[key][alphabet] = splitValues[index] ? splitValues[index].split(',') : [];
+    });
+  });
+
+  const epsilonTransitions: { [key: string]: string[] } = {};
+  for (const [key, value] of Object.entries(input.epsilons)) {
+    epsilonTransitions[key] = value.toLowerCase().split(",");
+  }
+
+  return {
+    states,
+    alphabets,
+    startState,
+    finalStates,
+    transitions,
+    epsilonTransitions,
   };
-  
-  const generateDFA = (input: ENFAInputProps): E_NFA2DFADataProps => {
-    const data = generateE_NFAData(input);
-    const strData = JSON.stringify(data);
-    const cloneData: ENFADataProps = JSON.parse(strData);
-  
-    const newFinalStates = generateFinalStatesWithClosure(cloneData);
-    const newTransitions = generateNewTransitions(cloneData);
-  
-    console.log("aaa", { data, newFinalStates, newTransitions });
-  
-    const nfaData = {
-      ...data,
-      finalStates: newFinalStates,
-      transitions: newTransitions,
-    };
-  
-    const dfaResult = nfaConverterRepository.generateDFAUsingData(nfaData);
-    console.log({ dfaResult });
-    return {
-      eNfaData: data,
-      dfaData: dfaResult.dfaData,
-      dfaTable: dfaResult.dfaTable,
-      dfaFinalStates: dfaResult.dfaFinalStates,
-    } as E_NFA2DFADataProps;
+};
+
+const generateClosure = (state: string, epsilonTransitions: { [key: string]: string[] }): string[] => {
+  const stack: string[] = [state];
+  const closure = new Set<string>();
+  closure.add(state);
+
+  while (stack.length > 0) {
+    const currentState = stack.pop()!;
+    (epsilonTransitions[currentState] || []).forEach((nextState: string) => {
+      if (!closure.has(nextState)) {
+        closure.add(nextState);
+        stack.push(nextState);
+      }
+    });
+  }
+
+  return Array.from(closure);
+};
+
+const convertENFAToNFAInput = (enfaData: ENFADataProps): NFAInputProps => {
+  const { states, alphabets, epsilonTransitions, transitions } = enfaData;
+  let nfaTransitions: { [key: string]: string } = {};
+
+  states.forEach(state => {
+    alphabets.forEach(alpha => {
+      const closureArray = generateClosure(state, epsilonTransitions);
+      let transitionStates = new Set<string>();
+      closureArray.forEach(closureState => {
+        transitions[closureState][alpha].forEach(transState => {
+          generateClosure(transState, epsilonTransitions).forEach(closureTransState => {
+            transitionStates.add(closureTransState);
+          });
+        });
+      });
+      nfaTransitions[state + ":" + alpha] = Array.from(transitionStates).join(',');
+    });
+  });
+
+  const nfaFinalStates = states.filter(state => 
+    generateClosure(state, epsilonTransitions).some(closureState => enfaData.finalStates.includes(closureState))
+  ).join(',');
+
+  return {
+    states: states.join(','),
+    alphabets: alphabets.join(','),
+    startState: enfaData.startState,
+    finalStates: nfaFinalStates,
+    transitions: nfaTransitions,
   };
-  
-  export const eNFAConverterRepository = {
-    generateDFA,
+};
+
+const generateDFA = (input: ENFAInputProps): E_NFA2DFADataProps => {
+  const enfaData = generateE_NFAData(input);
+  const nfaInput = convertENFAToNFAInput(enfaData);
+  const dfaResult = nfaConverterRepository.generateDFA(nfaInput);
+
+  return {
+    eNfaData: enfaData,
+    dfaData: dfaResult.dfaData,
+    dfaTable: dfaResult.dfaTable,
+    dfaFinalStates: dfaResult.dfaFinalStates,
   };
-  
+};
+
+export const eNFAConverterRepository = {
+  generateDFA,
+};

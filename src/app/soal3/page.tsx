@@ -4,9 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NavigationMenuDemo } from '@/components/Nav';
-import { SelectFA } from '@/components/Drop';
 import { Bsoal3 } from '@/components/Bread';
-import { Select } from "@/components/ui/select";
+import { minimizeDFA, simulateDFA, DFA } from './minimasi';
 import "./style.css";
 
 import { Button } from '@/components/ui/button';
@@ -16,37 +15,54 @@ interface Transitions {
 }
 
 export default function Soal1() {
-    const [states, setStates] = useState<string>("q0,q1,q2");
+    const [states, setStates] = useState<string>("q0,q1,q2,q3,q4");
     const [alphabets, setAlphabets] = useState<string>("0,1");
     const [startState, setStartState] = useState<string>("q0");
-    const [final, setFinalState] = useState<string>("q2");
-    const [jenisFA, setjenisFA] = useState<string>("nfa");
+    const [final, setFinalState] = useState<string>("q3");
     const [transitions, setTransitions] = useState<Transitions>({
-        q0: "q0,q1:q0",
-        q1: ":q2",
-        q2: ":",
+        "q0,0": "q1",
+        "q0,1": "q2",
+        "q1,0": "q1",
+        "q1,1": "q3",
+        "q2,0": "q1",
+        "q2,1": "q2",
+        "q3,0": "q1",
+        "q3,1": "q4",
+        "q4,0": "q1",
+        "q4,1": "q2",
     });
-    const [epsilons, setEpsilons] = useState<{ [key: string]: string; }>({
-        q0: "q1",
-        q1: "q3",
-        q2: "q4",
-        q3: "",
-        q4: "",
-    });
+
 
     const handleStateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newStates = event.target.value;
         setStates(newStates);
         const stateArray = newStates.split(',');
+        const alphabetArray = alphabets.split(',');
+
         const newTransitions: Transitions = {};
         stateArray.forEach(state => {
-            newTransitions[state] = transitions[state] || '';
+            alphabetArray.forEach(alphabet => {
+                const key = `${state},${alphabet}`;
+                newTransitions[key] = transitions[key] || '';
+            });
         });
         setTransitions(newTransitions);
     };
 
     const handleAlphabetsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAlphabets(event.target.value);
+        const newAlphabets = event.target.value;
+        setAlphabets(newAlphabets);
+        const stateArray = states.split(',');
+        const alphabetArray = newAlphabets.split(',');
+
+        const newTransitions: Transitions = {};
+        stateArray.forEach(state => {
+            alphabetArray.forEach(alphabet => {
+                const key = `${state},${alphabet}`;
+                newTransitions[key] = transitions[key] || '';
+            });
+        });
+        setTransitions(newTransitions);
     };
 
     const handleStartChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,22 +73,43 @@ export default function Soal1() {
         setFinalState(event.target.value);
     };
 
-    const handleAutomataTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setjenisFA(event.target.value);
-    };
-
-    const handleTransitionChange = (state: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleTransitionChange = (key: string, event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setTransitions({
             ...transitions,
-            [state]: value,
+            [key]: value,
         });
     };
 
-    const onClickButtonGenerate = () => {
 
+    const onClickButtonGenerate = () => {
+        const statesArray = states.split(',');
+        const finalStatesArray = final.split(',');
+        const alphabetArray = alphabets.split(',');
+
+        const dfa: DFA = {
+            states: statesArray,
+            alphabet: alphabetArray,
+            transitionFunction: transitions,
+            startState,
+            finalStates: finalStatesArray,
+        };
+
+        const minimizedDFA = minimizeDFA(dfa);
+
+        console.log("Testing original DFA:");
+        console.log("Input '0010':", simulateDFA(dfa, '0010'));
+        console.log("Input '1110':", simulateDFA(dfa, '1110'));
+
+        console.log("Testing minimized DFA:");
+        console.log("Input '0100':", simulateDFA(minimizedDFA, '0100'));
+        console.log("Input '0001':", simulateDFA(minimizedDFA, '0001'));
     };
 
+
+
+    const [dfaDisplay, setDfaDisplay] = useState<DFA | null>(null);
+    const [testResult, setTestResult] = useState<boolean | null>(null);
 
     return (
         <main>
@@ -128,23 +165,28 @@ export default function Soal1() {
                     />
                 </div>
                 <div className="mt-4 space-y-2 ">
-                    {Object.entries(transitions).map(([state, value], index) => (
-                        <div key={index} className="space-y-2">
-                            <Label htmlFor={state} className="Transitions" >Transitions {state} untuk {alphabets}</Label>
-                            <Input
-                                type="text"
-                                name={state}
-                                value={value}
-                                onChange={(e) => handleTransitionChange(state, e)}
-                            />
-                        </div>
-                    ))}
+                    {states.split(',').map((state) =>
+                        alphabets.split(',').map((input) =>
+                            <div key={`${state},${input}`} className="space-y-2">
+                                <Label htmlFor={`${state},${input}`}>Transition from {state} on input {input}</Label>
+                                <Input
+                                    type="text"
+                                    name={`${state},${input}`}
+                                    value={transitions[`${state},${input}`] || ''}
+                                    onChange={(e) => handleTransitionChange(`${state},${input}`, e)}
+                                />
+                            </div>
+                        )
+                    )}
+
                 </div>
                 <div className="mt-8 px-1 py-5">
-                <Button onClick={onClickButtonGenerate}>Minimize</Button>
+                    <Button onClick={onClickButtonGenerate}>Minimize</Button>
                 </div>
-
-
+                <div className="mt-4">
+                    {dfaDisplay && <div>Minimized DFA: {JSON.stringify(dfaDisplay)}</div>}
+                    {testResult !== null && <div>Test Result: {testResult ? 'Accepted' : 'Rejected'}</div>}
+                </div>
             </div>
         </main>
     );

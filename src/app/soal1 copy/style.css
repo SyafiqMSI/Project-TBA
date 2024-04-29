@@ -1,0 +1,15 @@
+#container,
+#head {
+    font-size: 14px; 
+  }
+
+  .states,
+  .alphabets,
+  .startState,
+  .finalState,
+  .jenisFA,
+  .epsilon,
+  .Transitions {
+    font-size: 13px;
+  }
+  

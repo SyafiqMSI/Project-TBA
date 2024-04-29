@@ -12,7 +12,6 @@ import { nfaConverterRepository } from "./ts/konverterNFA";
 import ComponentTableNFA from "./tabelNFA";
 import ComponentTableE_NFA from "./tabelENFA";
 import "./style.css";
-
 import {
   NFA2DFADataProps,
   E_NFA2DFADataProps
@@ -23,63 +22,26 @@ interface Transitions {
   [key: string]: string;
 }
 
-interface Input_Automata {
-  type: string;
-  states: string[];
-  alphabet: string[];
-  transitions: { [key: string]: Transitions };
-  start_state: string;
-  accepting_states: string[];
-  strings: string;
-}
-
 export default function Soal1() {
   const [states, setStates] = useState<string>("q0,q1,q2");
   const [alphabets, setAlphabets] = useState<string>("0,1");
   const [startState, setStartState] = useState<string>("q0");
   const [finalStates, setFinalState] = useState<string>("q2");
   const [jenisFA, setjenisFA] = useState<string>("nfa");
-  const [svgResponse1, setSvgResponse1] = useState<string>('');
-  const [svgResponse2, setSvgResponse2] = useState<string>('');
   const [transitions, setTransitions] = useState<Transitions>({
     q0: "q0,q1:q0",
     q1: ":q2",
     q2: ":",
   });
   const [epsilons, setEpsilons] = useState<{ [key: string]: string; }>({
-    q0: "q1",
-    q1: "q0",
+    q0: "q0",
+    q1: "q1",
     q2: "q2",
   });
 
-  const [automata, setAutomata] = useState<Input_Automata>({
-    type: "NFA",
-    states: [],
-    alphabet: [],
-    transitions: {},
-    start_state: "",
-    accepting_states: [],
-    strings: ""
-  });
 
   const [nfa2dfaData, setNfa2dfaData] = useState<NFA2DFADataProps>();
   const [eNfa2dfaData, setENfa2dfaData] = useState<E_NFA2DFADataProps>();
-
-  const handleChange = async () => {
-    try {
-      const requestOptions: RequestInit = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(automata)
-      };
-      const res = await fetch('http://localhost:5000/draw_diagram', requestOptions);
-      const data = await res.json();
-      setSvgResponse1(data.svgResult);
-      console.log(automata)
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
 
   const handleStateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newStates = event.target.value;
@@ -104,10 +66,6 @@ export default function Soal1() {
     setFinalState(event.target.value);
   };
 
-  const handleAutomataTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setjenisFA(event.target.value);
-  };
-
   const handleTransitionChange = (state: string, event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setTransitions({
@@ -125,7 +83,6 @@ export default function Soal1() {
         finalStates,
         transitions,
       });
-
       setNfa2dfaData(result);
     } else {
       const result = eNFAConverterRepository.generateDFA({
@@ -136,9 +93,6 @@ export default function Soal1() {
         transitions,
         epsilons,
       });
-
-      console.log({ result });
-
       setENfa2dfaData(result);
     }
   };
@@ -230,10 +184,6 @@ export default function Soal1() {
           </div>
 
           <div className="mx-left max-w-[300px]" style={{ marginLeft: '30px' }}>
-            {jenisFA === "nfa" && nfa2dfaData && (
-              <ComponentTableNFA {...nfa2dfaData} />
-            )}
-
             {jenisFA === "e-nfa" && (
               <>
                 <div className="mt-6 space-y-2">

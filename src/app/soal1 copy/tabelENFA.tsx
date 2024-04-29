@@ -61,8 +61,7 @@ export default function ComponentTableE_NFA({
                     })}
                 </TableBody>
             </Table>
-            
-            <p className="text-2xl font-semibold mt-8">Table DFA</p>
+
             <Table className="mt-4">
                 <TableHeader>
                     <TableRow>
