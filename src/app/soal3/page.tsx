@@ -21,6 +21,7 @@ export default function Soal3() {
     const [alphabets, setAlphabets] = useState<string>("0,1");
     const [startState, setStartState] = useState<string>("q0");
     const [final, setFinalState] = useState<string>("q3");
+    const [string, setString] = useState<string>("0001");
     const [transitions, setTransitions] = useState<Transitions>({
         "q0,0": "q1",
         "q0,1": "q2",
@@ -75,6 +76,10 @@ export default function Soal3() {
         setFinalState(event.target.value);
     };
 
+    const handleStringChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setString(event.target.value);
+    };
+
     const handleTransitionChange = (key: string, event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setTransitions({
@@ -88,7 +93,7 @@ export default function Soal3() {
         const statesArray = states.split(',');
         const finalStatesArray = final.split(',');
         const alphabetArray = alphabets.split(',');
-
+    
         const dfa: DFA = {
             states: statesArray,
             alphabet: alphabetArray,
@@ -96,18 +101,23 @@ export default function Soal3() {
             startState,
             finalStates: finalStatesArray,
         };
-
+    
         const minimizedDFA = minimizeDFA(dfa);
-
+    
         console.log("Testing original DFA:");
-        console.log("Input '0010':", simulateDFA(dfa, '0010'));
-        console.log("Input '1110':", simulateDFA(dfa, '1110'));
+        const originalResult = simulateDFA(dfa, string);
+        console.log(originalResult);
 
         console.log("Testing minimized DFA:");
-        console.log("Input '0100':", simulateDFA(minimizedDFA, '0100'));
-        console.log("Input '0001':", simulateDFA(minimizedDFA, '0001'));
+        const minimizedResult = simulateDFA(minimizedDFA, string);
+        console.log(minimizedResult);
+        if (originalResult && minimizedResult) {
+            alert("String di [Accept] oleh DFA awal dan DFA minimized");
+        } else {
+            alert("String di [Reject] oleh DFA awal dan DFA minimized");
+        }
     };
-
+    
 
 
     const [dfaDisplay, setDfaDisplay] = useState<DFA | null>(null);
@@ -139,7 +149,7 @@ export default function Soal3() {
                         onChange={handleStateChange}
                     />
                 </div>
-                <div className="space-y-2">
+                <div className="mt-5 space-y-2">
                     <Label htmlFor="alphabets" className="alphabets">Alphabets</Label>
                     <Input
                         type="text"
@@ -148,7 +158,7 @@ export default function Soal3() {
                         onChange={handleAlphabetsChange}
                     />
                 </div>
-                <div className="space-y-2">
+                <div className="mt-5 space-y-2">
                     <Label htmlFor="startState" className="startState" >Start State</Label>
                     <Input
                         type="text"
@@ -157,7 +167,7 @@ export default function Soal3() {
                         onChange={handleStartChange}
                     />
                 </div>
-                <div className="space-y-2">
+                <div className="mt-5 space-y-2">
                     <Label htmlFor="finalStates" >Final States</Label>
                     <Input
                         type="text"
@@ -166,11 +176,11 @@ export default function Soal3() {
                         onChange={handleFinalChange}
                     />
                 </div>
-                <div className="mt-4 space-y-2 ">
+                <div className="mt-3 space-y-2">
                     {states.split(',').map((state) =>
                         alphabets.split(',').map((input) =>
                             <div key={`${state},${input}`} className="space-y-2">
-                                <Label htmlFor={`${state},${input}`}>Transition from {state} on input {input}</Label>
+                                <Label htmlFor={`${state},${input}`} className="mt-5 space-y-2"> Transition from {state} on input {input}</Label>
                                 <Input
                                     type="text"
                                     name={`${state},${input}`}
@@ -181,6 +191,15 @@ export default function Soal3() {
                         )
                     )}
 
+                </div>
+                <div className="mt-5 space-y-2">
+                    <Label htmlFor="finalStates" >String</Label>
+                    <Input
+                        type="text"
+                        placeholder="01"
+                        value={string}
+                        onChange={handleStringChange}
+                    />
                 </div>
                 <div className="mt-8 px-1 py-5">
                     <Button onClick={onClickButtonGenerate}>Minimize</Button>
