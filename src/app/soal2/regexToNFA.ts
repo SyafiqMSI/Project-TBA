@@ -136,8 +136,8 @@ function evalRegexConcat(et: ExpressionTree): [FiniteAutomataState, FiniteAutoma
     const [rightStart, rightEnd] = evalRegex(et.right!);
 
     // Connect the end of the first NFA to the start of the second NFA directly without an epsilon if needed
-    leftEnd.next_state['epsilon'] = leftEnd.next_state['epsilon'] || [];
-    leftEnd.next_state['epsilon'].push(rightStart);
+    leftEnd.next_state['eps'] = leftEnd.next_state['eps'] || [];
+    leftEnd.next_state['eps'].push(rightStart);
 
     return [leftStart, rightEnd];
 }
@@ -149,13 +149,13 @@ function evalRegexUnion(et: ExpressionTree): [FiniteAutomataState, FiniteAutomat
     const [rightStart, rightEnd] = evalRegex(et.right!);
 
     // Ensure the start state has epsilon transitions to both NFA starts
-    start_state.next_state['epsilon'] = [leftStart, rightStart];
+    start_state.next_state['eps'] = [leftStart, rightStart];
 
     // Ensure both NFA ends have transitions to the new end state
-    leftEnd.next_state['epsilon'] = leftEnd.next_state['epsilon'] || [];
-    leftEnd.next_state['epsilon'].push(end_state);
-    rightEnd.next_state['epsilon'] = rightEnd.next_state['epsilon'] || [];
-    rightEnd.next_state['epsilon'].push(end_state);
+    leftEnd.next_state['eps'] = leftEnd.next_state['eps'] || [];
+    leftEnd.next_state['eps'].push(end_state);
+    rightEnd.next_state['eps'] = rightEnd.next_state['eps'] || [];
+    rightEnd.next_state['eps'].push(end_state);
 
     return [start_state, end_state];
 }
@@ -166,11 +166,11 @@ function evalRegexKleene(et: ExpressionTree): [FiniteAutomataState, FiniteAutoma
     const [subStart, subEnd] = evalRegex(et.left!);
 
     // Start state should have an epsilon transition to the sub-automata start and directly to the end state
-    start_state.next_state['epsilon'] = [subStart, end_state];
+    start_state.next_state['eps'] = [subStart, end_state];
 
     // Sub-automata end should loop back to its start and also to the end state
-    subEnd.next_state['epsilon'] = subEnd.next_state['epsilon'] || [];
-    subEnd.next_state['epsilon'].push(subStart, end_state);
+    subEnd.next_state['eps'] = subEnd.next_state['eps'] || [];
+    subEnd.next_state['eps'].push(subStart, end_state);
 
     return [start_state, end_state];
 }
@@ -205,14 +205,14 @@ function printStateTransitions(
             return numA - numB;
         });
 
-        transitionsOutput.push(`${symbol} --> ${nextStateLabels.join(", ")}`);
+        transitionsOutput.push(`${symbol}\t\t\t\t${nextStateLabels.join(", ")}`);
     }
 
     // Check for any transitions to print, or print a placeholder for no transitions
     if (transitionsOutput.length > 0) {
-        console.log(`${stateLabel}\t\t${transitionsOutput.join(" | ")}`);
+        console.log(`${stateLabel}\t\t\t${transitionsOutput.join(" | ")}`);
     } else {
-        console.log(`${stateLabel}\t\t- --> -`);
+        console.log(`${stateLabel}\t\t\t-\t\t\t\t-`);
     }
 
     // Recursive call to next states, handling each transition array properly
