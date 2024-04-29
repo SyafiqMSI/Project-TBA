@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from '@/components/ui/button';
+import { Bsoal2 } from '@/components/Bread';
+import { NavigationMenuDemo } from '@/components/Nav';
 import { postfix, 
          constructTree, 
          evalRegex, 
@@ -29,7 +31,19 @@ export default function Soal2() {
 
     return (
         <main>
+            <header className="py-5 px-5">
+                <NavigationMenuDemo/>
+            </header>
             <div className="mx-auto px-4 max-w-[768px] py-3 mt-1">
+                <Bsoal2 />
+                <div className="mt-8 space-y-4">
+                    <h1 className="font-bold text-3xl mt-4" style={{ fontSize: '2.3em' }}>
+                        REGEX to E-NFA
+                    </h1>
+                    <p style={{ fontSize: '1.0em' }}>
+                        Menerima input berupa regular expression dan dapat mengenerate e-NFA yang berhubungan.
+                    </p>
+                </div>
                 <div className="mt-5 space-y-2">
                     <Label htmlFor="regex" className="regex">REGEX</Label>
                     <Input
