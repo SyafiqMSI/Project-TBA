@@ -1,55 +1,42 @@
 'use client'
+// Import React dan fungsi useState dari 'react'
 import React, { useState } from 'react';
+
+// Impor komponen Input, Label, dan Button dari direktori komponen UI
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { NavigationMenuDemo } from '@/components/Nav';
-import { Bsoal2 } from '@/components/Bread';
 import { Button } from '@/components/ui/button';
-import { printTransitionTable, FiniteAutomataState, postfix, constructTree, evalRegex } from './regexToNFA';
 
+// Impor fungsi dan kelas yang diperlukan dari regexToNFA.ts
+import { postfix, constructTree, evalRegex, printTransitionTable, FiniteAutomataState, ExpressionTree } from './regexToNFA';
+
+// Definisikan komponen Soal1 sebagai sebuah fungsi
 export default function Soal1() {
+    // Definisikan state untuk regex dengan useState
     const [regex, setRegex] = useState<string>("(a+b)*a.b.b");
-    const [output, setOutput] = useState<string>("");
 
+    // Definisikan fungsi event handler untuk perubahan input regex
     const handleRegexChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newRegex = event.target.value;
         setRegex(newRegex);
     };
 
+    // Definisikan fungsi event handler untuk tombol Generate
     const onClickButtonGenerate = () => {
-        try {
-            const pr = postfix(regex);
-            const et = constructTree(pr);
-            const fa = evalRegex(et);
-            
-            // Menggunakan variabel lokal untuk menyimpan hasil cetakan
-            const printedOutput = printTransitionTable(fa);
-    
-            // Set state output dengan hasil cetakan
-            setOutput(printedOutput);
-        } catch (error) {
-            console.error("Error occurred while generating e-NFA:", error);
-            setOutput("Error occurred while generating e-NFA.");
-        }
+        // Konversi regex ke e-NFA
+        const pr = postfix(regex);
+        const et = constructTree(pr);
+        const fa = evalRegex(et);
+
+        // Print atau gunakan hasil e-NFA
+        printTransitionTable(fa);
     };
 
+    // Kembalikan JSX yang akan dirender oleh komponen Soal1
     return (
         <main>
-            <header className="py-5 px-5">
-                <NavigationMenuDemo />
-            </header>
-
             <div className="mx-auto px-4 max-w-[768px] py-3 mt-1">
-                <Bsoal2 />
-                <div className="mt-8 space-y-4">
-                    <h1 className="font-bold text-3xl mt-4" style={{ fontSize: '2.3em' }}>
-                        REGEX to e-NFA
-                    </h1>
-                    <p style={{ fontSize: '1.0em' }}>
-                        Menerima input berupa regular expression dan dapat mengenerate e-NFA yang berhubungan
-                    </p>
-                </div>
-
+                {/* Tampilkan label dan input untuk regex */}
                 <div className="mt-5 space-y-2">
                     <Label htmlFor="regex" className="regex">REGEX</Label>
                     <Input
@@ -59,19 +46,10 @@ export default function Soal1() {
                         onChange={handleRegexChange}
                     />
                 </div>
+                {/* Tampilkan tombol untuk mengonversi regex */}
                 <div className="mt-8 px-1 py-5">
                     <Button onClick={onClickButtonGenerate}>Convert to e-NFA</Button>
                 </div>
-
-                {output && (
-                    <div className="mt-8">
-                        <textarea
-                            className="border border-gray-300 rounded p-2 w-full h-80"
-                            value={output}
-                            readOnly
-                        />
-                    </div>
-                )}
             </div>
         </main>
     );

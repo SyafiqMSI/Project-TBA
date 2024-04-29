@@ -5,26 +5,25 @@ class Type:
     KLEENE = 4
 
 class ExpressionTree:
-
     def __init__(self, _type, value=None):
         self._type = _type
         self.value = value
         self.left = None
         self.right = None
-    
 
 def constructTree(regexp):
     stack = []
     for c in regexp:
         if c.isalpha():
             stack.append(ExpressionTree(Type.SYMBOL, c))
+        elif c == ".":
+            z = ExpressionTree(Type.CONCAT)
+            z.right = stack.pop()
+            z.left = stack.pop()
+            stack.append(z)
         else:
             if c == "+":
                 z = ExpressionTree(Type.UNION)
-                z.right = stack.pop()
-                z.left = stack.pop()
-            elif c == ".":
-                z = ExpressionTree(Type.CONCAT)
                 z.right = stack.pop()
                 z.left = stack.pop()
             elif c == "*":
@@ -54,7 +53,6 @@ def higherPrecedence(a, b):
     return p.index(a) > p.index(b)
 
 def postfix(regexp):
-    # adding dot "." between consecutive symbols
     temp = []
     for i in range(len(regexp)):
         if i != 0\
@@ -97,8 +95,6 @@ class FiniteAutomataState:
         self.next_state = {}
 
 def evalRegex(et):
-    # returns equivalent E-NFA for given expression tree (representing a Regular
-    # Expression)
     if et._type == Type.SYMBOL:
         return evalRegexSymbol(et)
     elif et._type == Type.CONCAT:
@@ -146,35 +142,54 @@ def evalRegexKleene(et):
 
     return start_state, end_state
 
-def printStateTransitions(state, states_done, symbol_table):
+def printStateTransitions(state, states_done, symbol_table, final_states):
     if state in states_done:
         return
 
     states_done.append(state)
 
+    state_label = "q" + str(symbol_table[state])
+    if state in final_states:
+        state_label += "*"
+    print(state_label, end="\t\t")
+    
+    transitions = {}
+
     for symbol in list(state.next_state):
-        line_output = "q" + str(symbol_table[state]) + "\t\t" + symbol + "\t\t\t"
-        for ns in state.next_state[symbol]:
+        next_states = state.next_state[symbol]
+        next_state_labels = []
+        for ns in next_states:
             if ns not in symbol_table:
-                symbol_table[ns] = 1 + sorted(symbol_table.values())[-1]
-            line_output = line_output + "q" + str(symbol_table[ns]) + " "
+                symbol_table[ns] = len(symbol_table)
+            next_state_label = "q" + str(symbol_table[ns])
+            if ns in final_states:
+                next_state_label += "*"
+            next_state_labels.append(next_state_label)
 
-        print(line_output)
+        transition_key = symbol + "\t\t" + ", ".join(next_state_labels)
+        transitions[transition_key] = True
+    
+    for transition_key in transitions:
+        print(transition_key)
 
-        for ns in state.next_state[symbol]:
-            printStateTransitions(ns, states_done, symbol_table)
+    if not state.next_state:
+        print("-\t\t-")
+
+    for ns in state.next_state.values():
+        for next_state in ns:
+            printStateTransitions(next_state, states_done, symbol_table, final_states)
 
 def printTransitionTable(finite_automata):
-    print("State\t\tSymbol\t\t\tNext state")
-    printStateTransitions(finite_automata[0], [], {finite_automata[0]:0})
+    start_state, final_state = finite_automata[0], finite_automata[1]
+    final_states = {final_state}
+    print("State\t\tSymbol\t\tNext state")
+    printStateTransitions(start_state, [], {start_state: 0}, final_states)
 
+def generate_transition_table():
+    regexp = input("Enter regex: ")
+    pr = postfix(regexp)
+    et = constructTree(pr)
+    fa = evalRegex(et)
+    printTransitionTable(fa)
 
-# Contoh penggunaan
-r = input("Enter regex: ")
-pr = postfix(r)
-et = constructTree(pr)
-
-# inorder(et)
-
-fa = evalRegex(et)
-printTransitionTable(fa)
+generate_transition_table()
