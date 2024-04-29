@@ -1,32 +1,37 @@
 'use client'
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NavigationMenuDemo } from '@/components/Nav';
-import { SelectFA } from '@/components/Drop';
 import { Bsoal2 } from '@/components/Bread';
-import { Select } from "@/components/ui/select";
-import "./style.css";
-
 import { Button } from '@/components/ui/button';
-
-interface Transitions {
-    [key: string]: string;
-}
+import { printTransitionTable, FiniteAutomataState, postfix, constructTree, evalRegex } from './regexToNFA';
 
 export default function Soal1() {
-    const [regex, setStates] = useState<string>("0+1*");
+    const [regex, setRegex] = useState<string>("(a+b)*a.b.b");
+    const [output, setOutput] = useState<string>("");
 
-    const handleStateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newStates = event.target.value;
-        setStates(newStates);
+    const handleRegexChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newRegex = event.target.value;
+        setRegex(newRegex);
     };
 
     const onClickButtonGenerate = () => {
-
+        try {
+            const pr = postfix(regex);
+            const et = constructTree(pr);
+            const fa = evalRegex(et);
+            
+            // Menggunakan variabel lokal untuk menyimpan hasil cetakan
+            const printedOutput = printTransitionTable(fa);
+    
+            // Set state output dengan hasil cetakan
+            setOutput(printedOutput);
+        } catch (error) {
+            console.error("Error occurred while generating e-NFA:", error);
+            setOutput("Error occurred while generating e-NFA.");
+        }
     };
-
 
     return (
         <main>
@@ -50,13 +55,23 @@ export default function Soal1() {
                     <Input
                         type="text"
                         placeholder="1*"
-                        defaultValue={regex}
-                        onChange={handleStateChange}
+                        value={regex}
+                        onChange={handleRegexChange}
                     />
                 </div>
                 <div className="mt-8 px-1 py-5">
-                <Button onClick={onClickButtonGenerate}>Convert to e-NFA</Button>
-              </div>
+                    <Button onClick={onClickButtonGenerate}>Convert to e-NFA</Button>
+                </div>
+
+                {output && (
+                    <div className="mt-8">
+                        <textarea
+                            className="border border-gray-300 rounded p-2 w-full h-80"
+                            value={output}
+                            readOnly
+                        />
+                    </div>
+                )}
             </div>
         </main>
     );
