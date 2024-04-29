@@ -6,12 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from '@/components/ui/button';
 import { Bsoal2 } from '@/components/Bread';
 import { NavigationMenuDemo } from '@/components/Nav';
-import { postfix, 
-         constructTree, 
-         evalRegex, 
-         printTransitionTable, 
-         FiniteAutomataState, 
-         ExpressionTree } from './regexToNFA';
+import { postfix, constructTree, evalRegex, printTransitionTable } from './regexToNFA';
 
 export default function Soal2() {
     const [regex, setRegex] = useState<string>("(a+b)*a.b.b");

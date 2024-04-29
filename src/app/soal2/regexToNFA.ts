@@ -177,29 +177,53 @@ function evalRegexKleene(et: ExpressionTree): [FiniteAutomataState, FiniteAutoma
 
 
 
-function printStateTransitions(state: FiniteAutomataState, statesDone: Set<FiniteAutomataState>, stateMapping: Map<FiniteAutomataState, string>): void {
+function printStateTransitions(
+    state: FiniteAutomataState,
+    statesDone: Set<FiniteAutomataState>,
+    stateMapping: Map<FiniteAutomataState, string>
+): void {
     if (statesDone.has(state)) return;
     statesDone.add(state);
 
-    // Ensuring each state has a unique label
     if (!stateMapping.has(state)) {
         stateMapping.set(state, `q${state.id}`);
     }
-
     const stateLabel = stateMapping.get(state);
 
+    let transitionsOutput = [];
     for (const symbol in state.next_state) {
         const transitions = state.next_state[symbol];
-        for (const nextState of transitions) {
+        const nextStateLabels = transitions.map(nextState => {
             if (!stateMapping.has(nextState)) {
                 stateMapping.set(nextState, `q${nextState.id}`);
             }
-            const nextStateLabel = stateMapping.get(nextState);
-            console.log(`${stateLabel} --${symbol}--> ${nextStateLabel}`);
-            printStateTransitions(nextState, statesDone, stateMapping);
-        }
+            return stateMapping.get(nextState);
+        }).sort((a, b) => {
+            // Ensure both a and b are defined and remove the 'q' prefix before parsing as integers
+            const numA = a ? parseInt(a.substring(1)) : 0;
+            const numB = b ? parseInt(b.substring(1)) : 0;
+            return numA - numB;
+        });
+
+        transitionsOutput.push(`${symbol} --> ${nextStateLabels.join(", ")}`);
     }
+
+    // Check for any transitions to print, or print a placeholder for no transitions
+    if (transitionsOutput.length > 0) {
+        console.log(`${stateLabel}\t\t${transitionsOutput.join(" | ")}`);
+    } else {
+        console.log(`${stateLabel}\t\t- --> -`);
+    }
+
+    // Recursive call to next states, handling each transition array properly
+    Object.values(state.next_state).forEach((transitions: FiniteAutomataState[]) => {
+        transitions.forEach((nextState: FiniteAutomataState) => {
+            printStateTransitions(nextState, statesDone, stateMapping);
+        });
+    });
 }
+
+
 
 function printTransitionTable(finiteAutomata: [FiniteAutomataState, FiniteAutomataState]): void {
     console.log("State\t\tSymbol\t\tNext state");
@@ -209,6 +233,7 @@ function printTransitionTable(finiteAutomata: [FiniteAutomataState, FiniteAutoma
 
     printStateTransitions(startState, statesDone, stateMapping);
 }
+
 
 export { postfix, constructTree, evalRegex, printTransitionTable, FiniteAutomataState, ExpressionTree };
 
