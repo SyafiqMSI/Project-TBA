@@ -12,7 +12,7 @@ interface TableDFAProps {
 const TableDFAMinimasi: React.FC<TableDFAProps> = ({ states, alphabets, startState, finalStates, transitions }) => {
     return (
         <div>
-            <h2>DFA Setelah Minimasi</h2>
+            <h2>DFA Setelah Minimasi (belum bener table dfa minimize nya) (mau tak perbaiki supaya state yang sama terhapus jadi 1 state aja)</h2>
             <table>
                 <thead>
                     <tr>
