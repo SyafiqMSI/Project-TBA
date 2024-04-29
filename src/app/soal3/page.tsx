@@ -6,8 +6,8 @@ import { Label } from "@/components/ui/label";
 import { NavigationMenuDemo } from '@/components/Nav';
 import { Bsoal3 } from '@/components/Bread';
 import { minimizeDFA, simulateDFA, DFA } from './minimasi';
-import TableDFA from './tableDFA'; // Import komponen TableDFA
-import TableDFAMinimasi from './tableDFAminimasi'; // Import komponen TableDFAMinimasi
+import TableDFA from './tableDFA';
+import TableDFAMinimasi from './tableDFAminimasi';
 import "./style.css";
 
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,10 @@ export default function Soal3() {
         "q4,0": "q1",
         "q4,1": "q2",
     });
+
+    const [minimizedStates, setMinimizedStates] = useState(states);
+    const [minimizedTransitions, setMinimizedTransitions] = useState(transitions);
+    const [minimizedFinalStates, setMinimizedFinalStates] = useState(final);
 
 
     const handleStateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +97,7 @@ export default function Soal3() {
         const statesArray = states.split(',');
         const finalStatesArray = final.split(',');
         const alphabetArray = alphabets.split(',');
-    
+
         const dfa: DFA = {
             states: statesArray,
             alphabet: alphabetArray,
@@ -101,9 +105,9 @@ export default function Soal3() {
             startState,
             finalStates: finalStatesArray,
         };
-    
+
         const minimizedDFA = minimizeDFA(dfa);
-    
+
         console.log("Testing original DFA:");
         const originalResult = simulateDFA(dfa, string);
         console.log(originalResult);
@@ -116,12 +120,10 @@ export default function Soal3() {
         } else {
             alert("String di [Reject] oleh DFA awal dan DFA minimized");
         }
+        setMinimizedStates(minimizedDFA.states.join(','));
+        setMinimizedTransitions(minimizedDFA.transitionFunction);
+        setMinimizedFinalStates(minimizedDFA.finalStates.join(','));
     };
-    
-
-
-    const [dfaDisplay, setDfaDisplay] = useState<DFA | null>(null);
-    const [testResult, setTestResult] = useState<boolean | null>(null);
 
     return (
         <main>
@@ -204,12 +206,7 @@ export default function Soal3() {
                 <div className="mt-8 px-1 py-5">
                     <Button onClick={onClickButtonGenerate}>Minimize</Button>
                 </div>
-                <div className="mt-4">
-                    {dfaDisplay && <div>Minimized DFA: {JSON.stringify(dfaDisplay)}</div>}
-                    {testResult !== null && <div>Test Result: {testResult ? 'Accepted' : 'Rejected'}</div>}
-                </div>
-                
-                {/* Memanggil komponen TableDFA */}
+
                 <TableDFA
                     states={states.split(',')}
                     alphabets={alphabets.split(',')}
@@ -218,15 +215,14 @@ export default function Soal3() {
                     transitions={transitions}
                 />
                 <br />
-                {/* Memanggil komponen TableDFAMinimasi */}
-                {/* Anda bisa melewatkan props yang sesuai */}
-                { <TableDFAMinimasi
-                    states={states.split(',')}
+                {<TableDFAMinimasi
+                    states={minimizedStates.split(',')}
                     alphabets={alphabets.split(',')}
                     startState={startState}
-                    finalStates={final.split(',')}
-                    transitions={transitions}
-                /> }
+                    finalStates={minimizedFinalStates.split(',')}
+                    transitions={minimizedTransitions}
+                />
+                }
             </div>
         </main>
     );

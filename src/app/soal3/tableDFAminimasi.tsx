@@ -1,4 +1,4 @@
-// tableDFAminimasi.tsx
+// TableDFAMinimasi.tsx
 import React from 'react';
 
 interface TableDFAProps {
@@ -12,11 +12,11 @@ interface TableDFAProps {
 const TableDFAMinimasi: React.FC<TableDFAProps> = ({ states, alphabets, startState, finalStates, transitions }) => {
     return (
         <div>
-            <h2>DFA Setelah Minimasi (belum bener table dfa minimize nya) (mau tak perbaiki supaya state yang sama terhapus jadi 1 state aja)</h2>
+            <h2>Minimized DFA Table</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>States</th>
+                        <th>State</th>
                         {alphabets.map((alphabet, index) => (
                             <th key={index}>{alphabet}</th>
                         ))}
@@ -27,7 +27,7 @@ const TableDFAMinimasi: React.FC<TableDFAProps> = ({ states, alphabets, startSta
                         <tr key={index}>
                             <td>{state}</td>
                             {alphabets.map((alphabet, idx) => (
-                                <td key={idx}>{transitions[`${state},${alphabet}`]}</td>
+                                <td key={idx}>{transitions[`${state},${alphabet}`] || '-'}</td>
                             ))}
                         </tr>
                     ))}
