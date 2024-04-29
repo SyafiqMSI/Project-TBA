@@ -198,16 +198,16 @@ export default function Soal3() {
                     finalStates={final.split(',')}
                     transitions={transitions}
                 />
-
+                <br />
                 {/* Memanggil komponen TableDFAMinimasi */}
                 {/* Anda bisa melewatkan props yang sesuai */}
-                {/* <TableDFAMinimasi
+                { <TableDFAMinimasi
                     states={states.split(',')}
                     alphabets={alphabets.split(',')}
                     startState={startState}
                     finalStates={final.split(',')}
                     transitions={transitions}
-                /> */}
+                /> }
             </div>
         </main>
     );
