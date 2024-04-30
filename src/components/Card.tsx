@@ -36,7 +36,7 @@ export function CardWithForm() {
               <CardHeader>
                 <CardTitle>Regular Expression</CardTitle>
                 <span style={{ margin: '5px' }}></span>
-                <CardDescription className=""> Menerima input berupa regular expression dan dapat mengenerate e-NFA yang berhubungan. </CardDescription>
+                <CardDescription className=""> Menerima input berupa regular expression dan dapat mengenerate e-NFA yang berhubungan</CardDescription>
               </CardHeader>
             </Card>
           </Link>
@@ -55,7 +55,7 @@ export function CardWithForm() {
           <Link href="/soal4">
             <Card style={cardStyle}>
               <CardHeader>
-                <CardTitle>Equivalensi</CardTitle>
+                <CardTitle>Equivalence</CardTitle>
                 <span style={{ margin: '5px' }}></span>
                 <CardDescription className="">Menerima input berupa dua buah DFA, kemudian menunjukkan keduanya equivalen atau tidak</CardDescription>
               </CardHeader>

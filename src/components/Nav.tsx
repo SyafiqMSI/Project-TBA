@@ -18,32 +18,33 @@ import { ModeToggle } from "./Theme";
 const components: { title: string; href: string; description: string }[] = [
   {
     title: "NFA e-NFA to DFA",
-    href: "/docs/primitives/alert-dialog",
+    href: "/soal1",
     description:
-      "A modal dialog that interrupts the user with important content and expects a response.",
+      "Menerima input untuk NFA ataupun e-NFA kemudian mengubahnya menjadi DFA yang berkaitan",
   },
   {
     title: "Regular Expression",
-    href: "/docs/primitives/hover-card",
+    href: "/soal2",
     description:
-      "For sighted users to preview content available behind a link.",
+      "Menerima input berupa regular expression dan dapat mengenerate e-NFA yang berhubungan",
   },
   {
     title: "Minimalism",
-    href: "/docs/primitives/progress",
+    href: "/soal3",
     description:
-      "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
+      "Menerima input berupa sebuah DFA kemudian membuat jadi minimal, dimana user dapat memasukkan input berupa string untuk mengetes DFA tesebut, baik sebelum maupun sesudah dalam bentuk minimal",
   },
   {
     title: "Equivalence",
-    href: "/docs/primitives/scroll-area",
-    description: "Visually or semantically separates content.",
+    href: "/soal4",
+    description:
+      "Menerima input berupa dua buah DFA, kemudian menunjukkan keduanya equivalen atau tidak",
   },
   {
     title: "Testing",
-    href: "/docs/primitives/tabs",
+    href: "/soal5",
     description:
-      "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
+      "Mengetes DFA, NFA, e-NFA ataupun reguler expression dengan memasukkan input berupa string untuk mengetahui apakah string tersebut di accept atau di reject",
   },
 ];
 
