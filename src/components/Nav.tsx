@@ -95,7 +95,7 @@ export function NavigationMenuDemo() {
                 </NavigationMenuLink>
               </li>
               <ListItem href="/introduction" title="Introduction">
-                Intro kelopok 3
+                Intro Kelompok 3
               </ListItem>
               <ListItem href="/docs/installation" title="Installation">
                 How to install dependencies and structure your app.
