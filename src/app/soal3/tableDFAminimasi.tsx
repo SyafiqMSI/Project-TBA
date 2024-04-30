@@ -1,44 +1,64 @@
-// TableDFAMinimasi.tsx
-import React from 'react';
+import React from "react";
+import { ArrowRight } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface TableDFAProps {
-    states: string[];
-    alphabets: string[];
-    startState: string;
-    finalStates: string[];
-    transitions: { [key: string]: string };
+  states: string[];
+  alphabets: string[];
+  startState: string;
+  finalStates: string[];
+  transitions: { [key: string]: string };
 }
 
-const TableDFAMinimasi: React.FC<TableDFAProps> = ({ states, alphabets, startState, finalStates, transitions }) => {
-    return (
-        <div>
-            <h2>Minimized DFA Table</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>State</th>
-                        {alphabets.map((alphabet, index) => (
-                            <th key={index}>{alphabet}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {states.map((state, index) => (
-                        <tr key={index}>
-                            <td>{state}</td>
-                            {alphabets.map((alphabet, idx) => (
-                                <td key={idx}>{transitions[`${state},${alphabet}`] || '-'}</td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <div>
-                <p>Start State: {startState}</p>
-                <p>Final States: {finalStates.join(', ')}</p>
-            </div>
-        </div>
-    );
+const TableDFAminimasi: React.FC<TableDFAProps> = ({
+  states,
+  alphabets,
+  startState,
+  finalStates,
+  transitions,
+}) => {
+  return (
+    <div>
+      <h2>DFA Minimasi</h2>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>States</TableHead>
+            {alphabets.map((alphabet, index) => (
+              <TableHead key={"table-head-" + alphabet + index}>
+                {alphabet}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {states.map((state, index) => (
+            <TableRow key={index}>
+              <TableCell>
+                {startState === state && (
+                  <ArrowRight className="inline w-4 h-4 mr-2" />
+                )}
+                {finalStates.includes(state) ? "*" : ""}
+                {state}
+              </TableCell>
+              {alphabets.map((alphabet, idx) => (
+                <TableCell key={idx}>
+                  {transitions[`${state},${alphabet}`]}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
 };
 
-export default TableDFAMinimasi;
+export default TableDFAminimasi;
