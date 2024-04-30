@@ -150,6 +150,22 @@ const generateDFA = (input: NFAInputProps): NFA2DFADataProps => {
   };
 };
 
+const generateDFAUsingData = (data: NFADataProps): NFA2DFADataProps => {
+  const dfaTable = generateDFATable(data);
+  const filteredData = generateDFAFilteredTableData(data, dfaTable);
+  const dfaData = generateDFAData(data, filteredData.table, filteredData.finalStates);
+
+  return {
+    nfaData: data,
+    dfaUnfilteredTable: dfaTable,
+    dfaData,
+    dfaTable: filteredData.table,
+    dfaFinalStates: filteredData.finalStates,
+  };
+};
+
+// Tambahkan ke nfaConverterRepository
 export const nfaConverterRepository = {
   generateDFA,
+  generateDFAUsingData,
 };

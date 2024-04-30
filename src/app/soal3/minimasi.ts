@@ -5,141 +5,116 @@ export interface DFA {
     startState: string;
     finalStates: string[];
 }
-function initializeDistinguishability(dfa: DFA): Set<string> {
-    let distinguishablePairs = new Set<string>();
-    
-    // Mark directly distinguishable states (final vs. non-final)
-    for (let i = 0; i < dfa.states.length; i++) {
-        for (let j = i + 1; j < dfa.states.length; j++) {
-            const state1 = dfa.states[i];
-            const state2 = dfa.states[j];
-            if (dfa.finalStates.includes(state1) !== dfa.finalStates.includes(state2)) {
-                distinguishablePairs.add(`${state1},${state2}`);
-                distinguishablePairs.add(`${state2},${state1}`);
-            }
-        }
-    }
 
-    return distinguishablePairs;
+function initializePartitions(dfa: DFA): Set<string>[] {
+    // Separate states into final and non-final as initial partitions
+    const finalStates = new Set(dfa.finalStates);
+    const partitions: Set<string>[] = [new Set(), new Set()];
+
+    dfa.states.forEach(state => {
+        if (finalStates.has(state)) {
+            partitions[0].add(state); // Final states partition
+        } else {
+            partitions[1].add(state); // Non-final states partition
+        }
+    });
+
+    return partitions.filter(partition => partition.size > 0);
 }
 
-function refineDistinguishability(dfa: DFA, distinguishablePairs: Set<string>): boolean {
-    let updated = false;
-    dfa.states.forEach(state1 => {
-        dfa.states.forEach(state2 => {
-            if (!distinguishablePairs.has(`${state1},${state2}`)) {
-                for (const symbol of dfa.alphabet) {
-                    const nextState1 = dfa.transitionFunction[`${state1},${symbol}`];
-                    const nextState2 = dfa.transitionFunction[`${state2},${symbol}`];
-                    if (distinguishablePairs.has(`${nextState1},${nextState2}`)) {
-                        distinguishablePairs.add(`${state1},${state2}`);
-                        distinguishablePairs.add(`${state2},${state1}`);
-                        updated = true;
-                        break;
-                    }
-                }
+
+function unreachableStates(dfa: DFA): string[] {
+    const reachable = new Set<string>([dfa.startState]);
+    const stack = [dfa.startState];
+    console.log("Starting unreachable state check from: ", dfa.startState);
+
+    while (stack.length) {
+        const state = stack.pop()!;
+        dfa.alphabet.forEach(symbol => {
+            const transitionKey = `${state},${symbol}`;
+            const nextState = dfa.transitionFunction[transitionKey];
+            if (nextState && !reachable.has(nextState)) {
+                reachable.add(nextState);
+                stack.push(nextState);
+                console.log(`State ${nextState} reached from ${state} on symbol ${symbol}`);
             }
         });
-    });
-    return updated;
-}
-// Util to mark pairs as distinguishable
-function markDistinguishable(table: Set<string>, state1: string, state2: string) {
-    table.add(`${state1},${state2}`);
-    table.add(`${state2},${state1}`);
+    }
+
+    const unreachableStates = dfa.states.filter(state => !reachable.has(state));
+    console.log("Unreachable States: ", unreachableStates);
+    return unreachableStates;
 }
 
-function isDistinguishable(table: Set<string>, state1: string, state2: string): boolean {
-    return table.has(`${state1},${state2}`);
-}
 
-function fillTable(dfa: DFA): Set<string> {
-    const table = new Set<string>();
-
-    // Initial marking based on final/non-final states
-    dfa.states.forEach((state1, i) => {
-        for (let j = i + 1; j < dfa.states.length; j++) {
-            const state2 = dfa.states[j];
-            if (dfa.finalStates.includes(state1) !== dfa.finalStates.includes(state2)) {
-                markDistinguishable(table, state1, state2);
-            }
+export function minimizeDFA(dfa: DFA): DFA {
+    let partitions = new Map<string, Set<string>>();
+    dfa.states.forEach(state => {
+        let key = dfa.finalStates.includes(state) ? 'final' : 'non-final';
+        if (!partitions.has(key)) {
+            partitions.set(key, new Set());
         }
+        partitions.get(key)!.add(state);
     });
 
-    // Refine marks based on transitions
     let changed = true;
     while (changed) {
         changed = false;
-        dfa.states.forEach((state1) => {
-            dfa.states.forEach((state2) => {
-                if (!isDistinguishable(table, state1, state2)) {
-                    dfa.alphabet.some(symbol => {
-                        const nextState1 = dfa.transitionFunction[`${state1},${symbol}`];
-                        const nextState2 = dfa.transitionFunction[`${state2},${symbol}`];
-                        if (isDistinguishable(table, nextState1, nextState2)) {
-                            markDistinguishable(table, state1, state2);
-                            changed = true;
-                            return true;
-                        }
-                        return false;
-                    });
+        let newPartitions = new Map<string, Set<string>>();
+
+        partitions.forEach((group, key) => {
+            group.forEach(state => {
+                let signature = dfa.alphabet.map(symbol => {
+                    let targetState = dfa.transitionFunction[`${state},${symbol}`];
+                    let targetKey = Array.from(partitions.entries()).find(([_, states]) => states.has(targetState))?.[0];
+                    return symbol + targetKey;
+                }).join(',');
+                let newKey = `${key}:${signature}`;
+                if (!newPartitions.has(newKey)) {
+                    newPartitions.set(newKey, new Set());
                 }
+                newPartitions.get(newKey)!.add(state);
             });
         });
+
+        if (newPartitions.size !== partitions.size) {
+            changed = true;
+            partitions = newPartitions;
+        }
     }
 
-    return table;
-}
-
-function mergeStates(dfa: DFA, distinguishablePairs: Set<string>): DFA {
-    const stateMapping = new Map<string, string>();
-    const newStateList = new Map<string, string[]>();
-
-    dfa.states.forEach(state => {
-        if (!stateMapping.has(state)) {
-            let found = false;
-            newStateList.forEach((mergedStates, newState) => {
-                if (mergedStates.includes(state) || mergedStates.some(s => !distinguishablePairs.has(`${s},${state}`))) {
-                    stateMapping.set(state, newState);
-                    mergedStates.push(state);
-                    found = true;
-                }
-            });
-            if (!found) {
-                const newState = `q${newStateList.size}`;
-                newStateList.set(newState, [state]);
-                stateMapping.set(state, newState);
-            }
-        }
+    let newStateMapping = new Map<string, string>();
+    let newStates: string[] = [];
+    let index = 0;
+    partitions.forEach((states, _) => {
+        let newState = `q${index++}`;
+        newStates.push(newState);
+        states.forEach(state => {
+            newStateMapping.set(state, newState);
+        });
     });
 
-    const newStates = Array.from(newStateList.keys());
-    const newTransitions: { [key: string]: string } = {};
-    const newFinalStates: string[] = newStates.filter(state => newStateList.get(state)!.some(s => dfa.finalStates.includes(s)));
-
-    newStates.forEach(newState => {
+    let newTransitions: { [key: string]: string } = {};
+    let newFinalStates: string[] = [];
+    newStates.forEach(state => {
         dfa.alphabet.forEach(symbol => {
-            const representative = newStateList.get(newState)![0];
-            const targetState = dfa.transitionFunction[`${representative},${symbol}`];
-            newTransitions[`${newState},${symbol}`] = stateMapping.get(targetState)!;
+            let originalState = Array.from(newStateMapping.keys()).find(s => newStateMapping.get(s) === state)!;
+            let nextState = dfa.transitionFunction[`${originalState},${symbol}`];
+            newTransitions[`${state},${symbol}`] = newStateMapping.get(nextState)!;
         });
+        if (dfa.finalStates.some(fs => newStateMapping.get(fs) === state)) {
+            newFinalStates.push(state);
+        }
     });
 
     return {
         states: newStates,
         alphabet: dfa.alphabet,
         transitionFunction: newTransitions,
-        startState: stateMapping.get(dfa.startState)!,
+        startState: newStateMapping.get(dfa.startState)!,
         finalStates: newFinalStates
     };
 }
-
-export function minimizeDFA(dfa: DFA): DFA {
-    let distinguishablePairs = initializeDistinguishability(dfa);
-    while (refineDistinguishability(dfa, distinguishablePairs));
-    return mergeStates(dfa, distinguishablePairs);
-}
-
 
 
 export function simulateDFA(dfa: DFA, inputString: string): boolean {

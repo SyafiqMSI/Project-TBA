@@ -34,9 +34,9 @@ export default function Soal1() {
     q2: ":",
   });
   const [epsilons, setEpsilons] = useState<{ [key: string]: string; }>({
-    q0: "q0:",
-    q1: ":",
-    q2: ":",
+    q0: "",
+    q1: "",
+    q2: "",
   });
 
 
