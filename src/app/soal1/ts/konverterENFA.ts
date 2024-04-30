@@ -22,21 +22,30 @@ const generateE_NFAData = (input: ENFAInputProps): ENFADataProps => {
   states.forEach(state => {
     transitions[state] = {};
     alphabets.forEach(alphabet => {
-      transitions[state][alphabet] = [];
+      transitions[state][alphabet] = []; // Initialize to ensure no undefined errors
     });
   });
 
   Object.entries(input.transitions).forEach(([key, value]) => {
-    const splitValues = value.toLowerCase().split(':');
     alphabets.forEach((alphabet, index) => {
-      transitions[key][alphabet] = splitValues[index] ? splitValues[index].split(',') : [];
+      const parts = value.split(":");
+      if (parts.length > index) { // Ensure there is a part available for this index
+        const targets = parts[index];
+        transitions[key][alphabet] = targets ? targets.split(",") : [];
+      } else {
+        console.warn(`Missing transition data for state ${key} and alphabet ${alphabet}`);
+        transitions[key][alphabet] = []; // Safe fallback
+      }
     });
-  });
+});
+
+
 
   const epsilonTransitions: { [key: string]: string[] } = {};
-  for (const [key, value] of Object.entries(input.epsilons)) {
-    epsilonTransitions[key] = value.toLowerCase().split(",");
-  }
+  Object.entries(input.epsilons).forEach(([key, value]) => {
+    const epsTargets = value.split(":"); // Assuming ':' separates epsilon targets
+    epsilonTransitions[key] = epsTargets.length > 0 ? epsTargets[0].split(",") : [];
+  });
 
   return {
     states,
@@ -47,6 +56,7 @@ const generateE_NFAData = (input: ENFAInputProps): ENFADataProps => {
     epsilonTransitions,
   };
 };
+
 
 const generateClosure = (state: string, epsilonTransitions: { [key: string]: string[] }): string[] => {
   const stack: string[] = [state];
