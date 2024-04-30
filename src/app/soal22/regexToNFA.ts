@@ -131,26 +131,13 @@ function evalRegex(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataStat
     }
 }
 
-function evalRegexConcat(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
-    const [leftStart, leftEnd] = evalRegex(et.left!);
-    const [rightStart, rightEnd] = evalRegex(et.right!);
-
-    // Connect the end of the first NFA to the start of the second NFA directly without an epsilon if needed
-    leftEnd.next_state['eps'] = [rightStart];
-
-    return [leftStart, rightEnd];
-}
-
 function evalRegexUnion(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
     const start_state = new FiniteAutomataState();
     const end_state = new FiniteAutomataState();
     const [leftStart, leftEnd] = evalRegex(et.left!);
     const [rightStart, rightEnd] = evalRegex(et.right!);
 
-    // Ensure the start state has epsilon transitions to both NFA starts
     start_state.next_state['eps'] = [leftStart, rightStart];
-
-    // Ensure both NFA ends have transitions to the new end state
     leftEnd.next_state['eps'] = leftEnd.next_state['eps'] || [];
     leftEnd.next_state['eps'].push(end_state);
     rightEnd.next_state['eps'] = rightEnd.next_state['eps'] || [];
@@ -162,17 +149,26 @@ function evalRegexUnion(et: ExpressionTree): [FiniteAutomataState, FiniteAutomat
 function evalRegexKleene(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
     const start_state = new FiniteAutomataState();
     const end_state = new FiniteAutomataState();
-    const sub_nfa = evalRegex(et.left!);
+    const [subStart, subEnd] = evalRegex(et.left!);
 
-    // Start state should have an epsilon transition to the sub-automata start and directly to the end state
-    start_state.next_state['eps'] = [sub_nfa[0], end_state];
-
-    // Sub-automata end should loop back to its start and also to the end state
-    sub_nfa[1].next_state['eps'] = sub_nfa[1].next_state['eps'] || [];
-    sub_nfa[1].next_state['eps'].push(sub_nfa[0], end_state);
+    start_state.next_state['eps'] = [subStart, end_state];
+    subEnd.next_state['eps'] = subEnd.next_state['eps'] || [];
+    subEnd.next_state['eps'].push(start_state, end_state);
 
     return [start_state, end_state];
 }
+
+
+function evalRegexConcat(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
+    const [leftStart, leftEnd] = evalRegex(et.left!);
+    const [rightStart, rightEnd] = evalRegex(et.right!);
+
+    leftEnd.next_state['eps'] = leftEnd.next_state['eps'] || [];
+    leftEnd.next_state['eps'].push(rightStart);
+
+    return [leftStart, rightEnd];
+}
+
 
 function printTransitionTable(finiteAutomata: [FiniteAutomataState, FiniteAutomataState]): string {
     let table = "State\t\tSymbol\t\tNext state\n";

@@ -29,6 +29,7 @@ export default function Soal2() {
             console.error("Error processing regex:", error);
         }
     };
+    
 
     return (
         <main>
@@ -67,3 +68,5 @@ export default function Soal2() {
         </main>
     );
 }
+
+
