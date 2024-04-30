@@ -100,9 +100,10 @@ export function NavigationMenuDemo() {
               <ListItem href="/docs/installation" title="Installation">
                 How to install dependencies and structure your app.
               </ListItem>
-              <ListItem href="/docs/primitives/typography" title="Typography">
-                Styles for headings, paragraphs, lists...etc
-              </ListItem>
+              <ListItem
+                href="https://github.com/SyafiqMSI/Project-TBA"
+                title="GitHub"
+              ></ListItem>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
