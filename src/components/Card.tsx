@@ -70,6 +70,15 @@ export function CardWithForm() {
               </CardHeader>
             </Card>
           </Link>
+          <Link href="/soal22">
+            <Card style={cardStyle}>
+              <CardHeader>
+                <CardTitle>REGEX COPY</CardTitle>
+                <span style={{ margin: '5px' }}></span>
+                <CardDescription className="">Mengetes DFA, NFA, e-NFA ataupun reguler expression dengan memasukkan input berupa string untuk mengetahui apakah string tersebut di accept atau di reject</CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
         </div>
       </div>
     )

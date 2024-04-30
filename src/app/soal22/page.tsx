@@ -6,12 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from '@/components/ui/button';
 import { Bsoal2 } from '@/components/Bread';
 import { NavigationMenuDemo } from '@/components/Nav';
-import { postfix, 
-         constructTree, 
-         evalRegex, 
-         printTransitionTable, 
-         FiniteAutomataState, 
-         ExpressionTree } from './regexToNFA';
+import { postfix, constructTree, evalRegex, printTransitionTable } from './regexToNFA';
 
 export default function Soal2() {
     const [regex, setRegex] = useState<string>("(a+b)*a.b.b");
@@ -22,11 +17,15 @@ export default function Soal2() {
     };
 
     const onClickButtonGenerate = () => {
-        const pr = postfix(regex);
-        const et = constructTree(pr);
-        const fa = evalRegex(et);
-
-        printTransitionTable(fa);
+        try {
+            const postfixed = postfix(regex);
+            const expressionTree = constructTree(postfixed);
+            const [startState, finalState] = evalRegex(expressionTree);
+            console.log('E-NFA transition table:');
+            printTransitionTable([startState, finalState]);
+        } catch (error) {
+            console.error("Error processing regex:", error);
+        }
     };
 
     return (
