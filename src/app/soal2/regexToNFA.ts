@@ -163,19 +163,16 @@ function evalRegexUnion(et: ExpressionTree): [FiniteAutomataState, FiniteAutomat
 function evalRegexKleene(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
     const start_state = new FiniteAutomataState();
     const end_state = new FiniteAutomataState();
-    const [subStart, subEnd] = evalRegex(et.left!);
+    const sub_nfa = evalRegex(et.left!);
 
     // Start state should have an epsilon transition to the sub-automata start and directly to the end state
-    start_state.next_state['eps'] = [subStart, end_state];
+    start_state.next_state['eps'] = [sub_nfa[0], end_state];
 
     // Sub-automata end should loop back to its start and also to the end state
-    subEnd.next_state['eps'] = subEnd.next_state['eps'] || [];
-    subEnd.next_state['eps'].push(subStart, end_state);
+    sub_nfa[1].next_state['eps'] = [sub_nfa[0], end_state];
 
     return [start_state, end_state];
 }
-
-
 
 function printStateTransitions(
     state: FiniteAutomataState,
@@ -223,8 +220,6 @@ function printStateTransitions(
     });
 }
 
-
-
 function printTransitionTable(finiteAutomata: [FiniteAutomataState, FiniteAutomataState]): void {
     console.log("State\t\tSymbol\t\tNext state");
     const [startState, finalState] = finiteAutomata;
@@ -233,7 +228,6 @@ function printTransitionTable(finiteAutomata: [FiniteAutomataState, FiniteAutoma
 
     printStateTransitions(startState, statesDone, stateMapping);
 }
-
 
 export { postfix, constructTree, evalRegex, printTransitionTable, FiniteAutomataState, ExpressionTree };
 
