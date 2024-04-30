@@ -136,8 +136,6 @@ export default function Soal3() {
     setMinimizedTransitions(minimizedDFA.transitionFunction);
     setMinimizedFinalStates(minimizedDFA.finalStates.join(","));
 
-    // menampilkan tabel transisi minimisasi:
-    setMinimizedTransitions(minimizedDFA.transitionFunction);
   };
 
   return (

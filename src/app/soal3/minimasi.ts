@@ -23,20 +23,21 @@ function initializePartitions(dfa: DFA): Set<string>[] {
 }
 
 
-function unreachableStates(dfa: DFA): string[] {
-    const reachable = new Set<string>([dfa.startState]);
-    const stack = [dfa.startState];
-    console.log("Starting unreachable state check from: ", dfa.startState);
-
-    while (stack.length) {
-        const state = stack.pop()!;
-        dfa.alphabet.forEach(symbol => {
-            const transitionKey = `${state},${symbol}`;
-            const nextState = dfa.transitionFunction[transitionKey];
-            if (nextState && !reachable.has(nextState)) {
-                reachable.add(nextState);
-                stack.push(nextState);
-                console.log(`State ${nextState} reached from ${state} on symbol ${symbol}`);
+function refineDistinguishability(dfa: DFA, distinguishablePairs: Set<string>): boolean {
+    let updated = false;
+    dfa.states.forEach(state1 => {
+        dfa.states.forEach(state2 => {
+            if (!distinguishablePairs.has(`${state1},${state2}`)) {
+                for (const symbol of dfa.alphabet) {
+                    const nextState1 = dfa.transitionFunction[`${state1},${symbol}`];
+                    const nextState2 = dfa.transitionFunction[`${state2},${symbol}`];
+                    if (distinguishablePairs.has(`${nextState1},${nextState2}`)) {
+                        distinguishablePairs.add(`${state1},${state2}`);
+                        distinguishablePairs.add(`${state2},${state1}`);
+                        updated = true;
+                        break;
+                    }
+                }
             }
         });
     }
@@ -46,34 +47,37 @@ function unreachableStates(dfa: DFA): string[] {
     return unreachableStates;
 }
 
+function fillTable(dfa: DFA): Set<string> {
+    const table = new Set<string>();
 
-export function minimizeDFA(dfa: DFA): DFA {
-    let partitions = new Map<string, Set<string>>();
-    dfa.states.forEach(state => {
-        let key = dfa.finalStates.includes(state) ? 'final' : 'non-final';
-        if (!partitions.has(key)) {
-            partitions.set(key, new Set());
+    // Initial marking based on final/non-final states
+    dfa.states.forEach((state1, i) => {
+        for (let j = i + 1; j < dfa.states.length; j++) {
+            const state2 = dfa.states[j];
+            if (dfa.finalStates.includes(state1) !== dfa.finalStates.includes(state2)) {
+                markDistinguishable(table, state1, state2);
+            }
         }
-        partitions.get(key)!.add(state);
     });
 
+    // Refine marks based on transitions
     let changed = true;
     while (changed) {
         changed = false;
-        let newPartitions = new Map<string, Set<string>>();
-
-        partitions.forEach((group, key) => {
-            group.forEach(state => {
-                let signature = dfa.alphabet.map(symbol => {
-                    let targetState = dfa.transitionFunction[`${state},${symbol}`];
-                    let targetKey = Array.from(partitions.entries()).find(([_, states]) => states.has(targetState))?.[0];
-                    return symbol + targetKey;
-                }).join(',');
-                let newKey = `${key}:${signature}`;
-                if (!newPartitions.has(newKey)) {
-                    newPartitions.set(newKey, new Set());
+        dfa.states.forEach((state1) => {
+            dfa.states.forEach((state2) => {
+                if (!isDistinguishable(table, state1, state2)) {
+                    dfa.alphabet.some(symbol => {
+                        const nextState1 = dfa.transitionFunction[`${state1},${symbol}`];
+                        const nextState2 = dfa.transitionFunction[`${state2},${symbol}`];
+                        if (isDistinguishable(table, nextState1, nextState2)) {
+                            markDistinguishable(table, state1, state2);
+                            changed = true;
+                            return true;
+                        }
+                        return false;
+                    });
                 }
-                newPartitions.get(newKey)!.add(state);
             });
         });
 

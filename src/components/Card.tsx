@@ -1,5 +1,5 @@
-import * as React from "react"
-import Link from 'next/link';
+import * as React from "react";
+import Link from "next/link";
 
 import {
   Card,
@@ -8,16 +8,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 
 export function CardWithForm() {
-    const cardStyle = {
-        width: '100%', 
-        maxWidth: '350px', 
-        height: '200px', 
-        marginRight: '20px',
-        marginTop: '20px',
-    };
+  const cardStyle = {
+    width: "100%",
+    maxWidth: "350px",
+    height: "200px",
+    marginRight: "20px",
+    marginTop: "20px",
+  };
 
     return (
       <div className="Soal" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -36,7 +36,7 @@ export function CardWithForm() {
               <CardHeader>
                 <CardTitle>Regular Expression</CardTitle>
                 <span style={{ margin: '5px' }}></span>
-                <CardDescription className=""> Menerima input berupa regular expression dan dapat mengenerate e-NFA yang berhubungan. </CardDescription>
+                <CardDescription className=""> Menerima input berupa regular expression dan dapat mengenerate e-NFA yang berhubungan</CardDescription>
               </CardHeader>
             </Card>
           </Link>
@@ -55,7 +55,7 @@ export function CardWithForm() {
           <Link href="/soal4">
             <Card style={cardStyle}>
               <CardHeader>
-                <CardTitle>Equivalensi</CardTitle>
+                <CardTitle>Equivalence</CardTitle>
                 <span style={{ margin: '5px' }}></span>
                 <CardDescription className="">Menerima input berupa dua buah DFA, kemudian menunjukkan keduanya equivalen atau tidak</CardDescription>
               </CardHeader>
@@ -65,15 +65,6 @@ export function CardWithForm() {
             <Card style={cardStyle}>
               <CardHeader>
                 <CardTitle>Testing</CardTitle>
-                <span style={{ margin: '5px' }}></span>
-                <CardDescription className="">Mengetes DFA, NFA, e-NFA ataupun reguler expression dengan memasukkan input berupa string untuk mengetahui apakah string tersebut di accept atau di reject</CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-          <Link href="/soal22">
-            <Card style={cardStyle}>
-              <CardHeader>
-                <CardTitle>REGEX COPY</CardTitle>
                 <span style={{ margin: '5px' }}></span>
                 <CardDescription className="">Mengetes DFA, NFA, e-NFA ataupun reguler expression dengan memasukkan input berupa string untuk mengetahui apakah string tersebut di accept atau di reject</CardDescription>
               </CardHeader>
