@@ -10,7 +10,7 @@ export default function Soal2() {
       <header className="py-5 px-5">
         <NavigationMenuDemo />
       </header>
-      <div className="mx-auto px-4 max-w-[1650px] py-3 mt-1">
+      <div className="mx-auto px-4 max-w-[768px] py-3 mt-1">
         <Bintro/>
         <div className="mt-8 space-y-4">
           <h1 className="font-bold text-3xl mt-4" style={{ fontSize: "2.3em" }}>
