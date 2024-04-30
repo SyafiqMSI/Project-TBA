@@ -180,49 +180,59 @@ function printTransitionTable(finiteAutomata: [FiniteAutomataState, FiniteAutoma
     const stateMapping = new Map<FiniteAutomataState, string>();
     const statesDone = new Set<FiniteAutomataState>();
 
-    function printStateTransitions(
-        state: FiniteAutomataState,
-        stateMapping: Map<FiniteAutomataState, string>
-    ): string {
-        let transitionsOutput: string[] = [];
-        for (const symbol in state.next_state) {
-            const transitions = state.next_state[symbol];
-            const nextStateLabels = transitions.map(nextState => {
-                if (!stateMapping.has(nextState)) {
-                    stateMapping.set(nextState, `q${nextState.id}`);
-                }
-                return stateMapping.get(nextState)!;
-            }).sort((a, b) => parseInt(a.substring(1)) - parseInt(b.substring(1)));
+function printStateTransitions(
+    state: FiniteAutomataState,
+    statesDone: Set<FiniteAutomataState>,
+    stateMapping: Map<FiniteAutomataState, string>
+): void {
+    if (statesDone.has(state)) return;
+    statesDone.add(state);
+
+    if (!stateMapping.has(state)) {
+        stateMapping.set(state, `q${state.id}`);
+    }
+    const stateLabel = stateMapping.get(state);
+
+    let transitionsOutput = [];
+    for (const symbol in state.next_state) {
+        const transitions = state.next_state[symbol];
+        const nextStateLabels = transitions.map(nextState => {
+            if (!stateMapping.has(nextState)) {
+                stateMapping.set(nextState, `q${nextState.id}`);
+            }
+            return stateMapping.get(nextState);
+        }).sort((a, b) => {
+            // Ensure both a and b are defined and remove the 'q' prefix before parsing as integers
+            const numA = a ? parseInt(a.substring(1)) : 0;
+            const numB = b ? parseInt(b.substring(1)) : 0;
+            return numA - numB;
+        });
 
             transitionsOutput.push(`${symbol}\t\t\t\t${nextStateLabels.join(", ")}`);
         }
 
-        // Check for any transitions to print, or print a placeholder for no transitions
-        if (transitionsOutput.length > 0) {
-            return `${stateMapping.get(state)}\t\t\t${transitionsOutput.join(", ")}\n`;
-        } else {
-            return `*${stateMapping.get(state)}\t\t\t-\t\t\t\t-\n`;
-        }
+    // Check for any transitions to print, or print a placeholder for no transitions
+    if (transitionsOutput.length > 0) {
+        console.log(`${stateLabel}\t\t\t${transitionsOutput.join(" | ")}`);
+    } else {
+        console.log(`\*${stateLabel}\t\t\t-\t\t\t\t-`);
     }
 
-    function traverseStates(state: FiniteAutomataState) {
-        if (statesDone.has(state)) return;
-        statesDone.add(state);
+    // Recursive call to next states, handling each transition array properly
+    Object.values(state.next_state).forEach((transitions: FiniteAutomataState[]) => {
+        transitions.forEach((nextState: FiniteAutomataState) => {
+            printStateTransitions(nextState, statesDone, stateMapping);
+        });
+    });
+}
 
-        if (!stateMapping.has(state)) {
-            stateMapping.set(state, `q${state.id}`);
-        }
-        table += printStateTransitions(state, stateMapping);
+function printTransitionTable(finiteAutomata: [FiniteAutomataState, FiniteAutomataState]): void {
+    console.log("State\t\tSymbol\t\tNext state");
+    const [startState, finalState] = finiteAutomata;
+    const stateMapping = new Map<FiniteAutomataState, string>();
+    const statesDone = new Set<FiniteAutomataState>();
 
-        for (const symbol in state.next_state) {
-            state.next_state[symbol].forEach(nextState => {
-                traverseStates(nextState);
-            });
-        }
-    }
-
-    traverseStates(startState);
-    return table;
+    printStateTransitions(startState, statesDone, stateMapping);
 }
 
 
