@@ -1,3 +1,5 @@
+import re
+
 class Automaton:
     def __init__(self):
         self.states = set()
@@ -23,6 +25,11 @@ class Automaton:
         else:
             self.transitions[(from_state, input_char)] = to_state if isinstance(self, DFA) else {to_state}
 
+    def transition(self, from_state, input_char, to_state):
+        if input_char == '':
+            input_char = 'ε'  # Menggunakan 'ε' untuk merepresentasikan transisi epsilon
+        return f"Transition: ({from_state}, '{input_char}') -> {to_state}"
+    
     def evaluate(self, input_string):
         pass  # Akan diimplementasikan di subclasses
 
@@ -51,12 +58,30 @@ class NFA(Automaton):
 
 
 class ENFA(NFA):
-    pass
+    def evaluate(self, input_string):
+        current_states = self.epsilon_closure({self.start_state})
+        for char in input_string:
+            next_states = set()
+            for state in current_states:
+                next_states.update(self.transitions.get((state, char), set()))
+            current_states = self.epsilon_closure(next_states)
+        return "Accepted" if any(state in self.accept_states for state in current_states) else "Rejected"
+
+    def epsilon_closure(self, states):
+        closure = set(states)
+        stack = list(states)
+        while stack:
+            state = stack.pop()
+            epsilon_transitions = self.transitions.get((state, ''), set())
+            for next_state in epsilon_transitions:
+                if next_state not in closure:
+                    closure.add(next_state)
+                    stack.append(next_state)
+        return closure
 
 
 class Regex(Automaton):
     def __init__(self, pattern):
-        import re
         self.pattern = re.compile(pattern)
 
     def evaluate(self, input_string):
@@ -65,12 +90,12 @@ class Regex(Automaton):
 
 def main():
     while True:
-        automaton_type = input("Choose automaton type (DFA/NFA/e-NFA/Regex, or 'exit' to quit): ").strip().upper()
+        automaton_type = input("Choose automaton type (DFA/NFA/ENFA/Regex, or 'exit' to quit): ").strip().upper()
         if automaton_type == "EXIT":
             print("Exiting program.")
             break
-        elif automaton_type not in ["DFA", "NFA", "E-NFA", "REGEX"]:
-            print("Invalid automaton type. Please choose from DFA, NFA, e-NFA, or Regex.")
+        elif automaton_type not in ["DFA", "NFA", "ENFA", "REGEX"]:
+            print("Invalid automaton type. Please choose from DFA, NFA, ENFA, or Regex.")
             continue
 
         if automaton_type == "REGEX":
@@ -87,20 +112,20 @@ def main():
         else:
             automaton = globals()[automaton_type]()  # Membuat objek automaton berdasarkan pilihan pengguna
 
-            states = set(input("Enter states (ex: q0,q1,q2,...): ").split(','))
-            start_state = input("Enter start state(letak start state): ")
-            accept_states = set(input("Enter accept states (letak accepting state): ").split(','))
+            states = set(input("Enter states (comma-separated): ").split(','))
+            start_state = input("Enter start state: ")
+            accept_states = set(input("Enter accept states (comma-separated): ").split(','))
 
             automaton.set_states(states)
             automaton.set_start_state(start_state)
             automaton.set_accept_states(accept_states)
 
             while True:
-                from_state = input("Enter from state(state asal) (or type 'done' to finish): ")
+                from_state = input("Enter from state (or type 'done' to finish): ")
                 if from_state == 'done':
                     break
-                input_char = input("Enter input character(bisa berupa 0 atau 1): ")
-                to_state = input("Enter to state(state tujuan): ")
+                input_char = input("Enter input character: ")
+                to_state = input("Enter to state: ")
                 automaton.add_transition(from_state, input_char, to_state)
 
             test_string = input("Enter a string to test: ")
@@ -110,7 +135,6 @@ def main():
             option = input("Enter 'details' to see the detailed process, or 'exit' to quit: ").strip().lower()
             if option == "details":
                 print("Details of the process:")
-                # Implementasi untuk melihat rincian proses
                 print("States:", automaton.states)
                 print("Start state:", automaton.start_state)
                 print("Accept states:", automaton.accept_states)
