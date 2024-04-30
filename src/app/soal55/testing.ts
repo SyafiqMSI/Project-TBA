@@ -1,89 +1,60 @@
-interface State {
-    name: string;
-    transitions: { [symbol: string]: string[] };
-}
+// Definisikan tipe untuk transisi
+type Transitions = {
+    [key: string]: string; // Key adalah string yang mewakili state dan value adalah string transisi
+};
 
-class Automaton {
-    states: State[];
+// Interface untuk Finite Automaton
+interface FA {
+    regex: string;
+    states: string[];
+    alphabets: string[];
     startState: string;
-    acceptStates: Set<string>;
+    finalState: string;
+    transitions: Transitions;
+    epsilons?: { [key: string]: string };
+}
 
-    constructor(states: State[], startState: string, acceptStates: string[]) {
-        this.states = states;
-        this.startState = startState;
-        this.acceptStates = new Set(acceptStates);
+// Fungsi untuk mengecek string terhadap FA
+export const checkStringAgainstFA = (fa: FA, inputString: string): boolean => {
+    const { startState, finalState, transitions, epsilons } = fa;
+
+    // Fungsi bantuan untuk mengurai transisi dan transisi epsilon
+    const parseTransitions = (transString: string) => {
+        return transString.split(',').reduce((acc, curr) => {
+            const [key, value] = curr.split(':');
+            acc[key] = value ? value.split(',') : [];
+            return acc;
+        }, {} as { [input: string]: string[] });
+    };
+
+    // Inisialisasi state saat ini dengan state awal, mempertimbangkan transisi epsilon
+    let currentStates = new Set<string>();
+    const addEpsilonStates = (state: string) => {
+        currentStates.add(state);
+        const epsTransitions = epsilons && epsilons[state] ? epsilons[state].split(',') : [];
+        epsTransitions.forEach(epsState => {
+            if (!currentStates.has(epsState)) {
+                addEpsilonStates(epsState);
+            }
+        });
+    };
+    addEpsilonStates(startState);
+
+    // Proses setiap karakter dalam string
+    for (let char of inputString) {
+        const nextStates = new Set<string>();
+        currentStates.forEach(state => {
+            const stateTransitions = parseTransitions(transitions[state] || "");
+            if (stateTransitions[char]) {
+                stateTransitions[char].forEach(nextState => {
+                    addEpsilonStates(nextState);
+                    nextStates.add(nextState);
+                });
+            }
+        });
+        currentStates = nextStates;
     }
 
-    isAccepted(input: string): boolean {
-        let currentState = this.startState;
-
-        for (const symbol of input) {
-            const transitions = this.states.find(state => state.name === currentState)?.transitions[symbol];
-            if (!transitions) return false;
-            currentState = transitions[0];
-        }
-
-        return this.acceptStates.has(currentState);
-    }
-}
-
-// Example DFA
-const dfaStates: State[] = [
-    { name: 'q0', transitions: { '0': ['q0'], '1': ['q1'] } },
-    { name: 'q1', transitions: { '0': ['q2'], '1': ['q1'] } },
-    { name: 'q2', transitions: { '0': ['q2'], '1': ['q1'] } }
-];
-
-const DFa = new Automaton(dfaStates, 'q0', ['q2']);
-
-// Example NFA
-const nfaStates: State[] = [
-    { name: 'q0', transitions: { '0': ['q0', 'q1'], '1': ['q0'] } },
-    { name: 'q1', transitions: { '0': [], '1': ['q2'] } },
-    { name: 'q2', transitions: { '0': [], '1': ['q1'] } }
-];
-
-const nfa = new Automaton(nfaStates, 'q0', ['q1']);
-
-// Example ε-NFA
-const enfaStates: State[] = [
-    { name: 'q0', transitions: { '0': ['q1'], '1': ['q0'], 'ε': ['q2'] } },
-    { name: 'q1', transitions: { '0': [], '1': ['q2'], 'ε': [] } },
-    { name: 'q2', transitions: { '0': [], '1': [], 'ε': ['q0'] } }
-];
-
-const enfa = new Automaton(enfaStates, 'q0', ['q2']);
-
-const regex = /^(a|b)*abb$/;
-
-function testAutomaton(automaton: Automaton, input: string): void {
-    console.log(`Testing ${input}: ${automaton.isAccepted(input) ? 'Accepted' : 'Rejected'}`);
-}
-
-function testRegex(regex: RegExp, input: string): void {
-    console.log(`Testing ${input}: ${regex.test(input) ? 'Accepted' : 'Rejected'}`);
-}
-
-// Test the DFAs
-console.log("Testing DFAs:");
-testAutomaton(DFa, '110');
-testAutomaton(DFa, '101');
-testAutomaton(DFa, '111');
-
-// Test the NFAs
-console.log("\nTesting NFAs:");
-testAutomaton(nfa, '110');
-testAutomaton(nfa, '101');
-testAutomaton(nfa, '111');
-
-// Test the ε-NFAs
-console.log("\nTesting ε-NFAs:");
-testAutomaton(enfa, '110');
-testAutomaton(enfa, '101');
-testAutomaton(enfa, '111');
-
-// Test the regular expression
-console.log("\nTesting regular expression:");
-testRegex(regex, 'ababb');
-testRegex(regex, 'aababb');
-testRegex(regex, 'abab');
+    // Periksa jika salah satu state saat ini adalah state akhir
+    return Array.from(currentStates).some(state => state === finalState);
+};

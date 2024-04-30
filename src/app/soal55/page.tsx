@@ -7,6 +7,7 @@ import { NavigationMenuDemo } from '@/components/Nav';
 import { SelectFA5 } from '@/components/Drop5';
 import { Bsoal5 } from '@/components/Bread';
 import { Select } from "@/components/ui/select";
+import { checkStringAgainstFA } from './testing';
 import "./style.css";
 
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,7 @@ export default function Soal5() {
     const [startState, setStartState] = useState<string>("q0");
     const [final, setFinalState] = useState<string>("q2");
     const [jenisFA5, setjenisFA] = useState<string>("nfa");
+    const [string, setString] = useState<string>("0111");
     const [transitions, setTransitions] = useState<Transitions>({
         q0: "q0,q1:q0",
         q1: ":q2",
@@ -58,8 +60,13 @@ export default function Soal5() {
         setFinalState(event.target.value);
     };
 
-    const handleAutomataTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setjenisFA(event.target.value);
+    const handleRegexChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newRegex = event.target.value;
+        setRegex(newRegex);
+    };
+
+    const handleStringChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setString(event.target.value);
     };
 
     const handleTransitionChange = (state: string, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,16 +78,50 @@ export default function Soal5() {
     };
 
     const onClickButtonGenerate = () => {
-        if (jenisFA5 === "nfa") {
-         
+        const fa = {
+            regex: regex, // Assume regex is the regular expression for the FA
+            states: states.split(','),
+            alphabets: alphabets.split(','),
+            startState: startState,
+            finalState: final,
+            transitions: transitions,
+            epsilons: epsilons, // Only necessary if the FA type is E-NFA
+        };
+    
+        if (jenisFA5 === "nfa" || jenisFA5 === "e-nfa") {
+            const result = checkStringAgainstFA(fa, string);
+            console.log(`Result for ${jenisFA5.toUpperCase()}: ${result}`);
         } else if (jenisFA5 === "dfa") {
-        
-        } else if (jenisFA5 === "e-nfa") {
-        
+            // Implementing DFA logic
+            let currentState = startState;
+            let valid = true;
+            for (let char of string) {
+                const stateTransitions = transitions[currentState] ? transitions[currentState].split(",") : [];
+                let nextState = null;
+                for (let trans of stateTransitions) {
+                    const [condition, resultState] = trans.split(":");
+                    if (condition === char) {
+                        if (nextState) {
+                            console.log("Non-deterministic transition found in DFA");
+                            valid = false;
+                            break;
+                        }
+                        nextState = resultState;
+                    }
+                }
+                if (!nextState || !valid) {
+                    valid = false;
+                    break;
+                }
+                currentState = nextState;
+            }
+            const result = valid && currentState === final;
+            console.log(`Result for DFA: ${result}`);
         } else if (jenisFA5 === "regex") {
-        
-        } else {
-            alert("Automata tidak ditemukan");
+            // Implementing Regex-based FA logic
+            const regexPattern = new RegExp(`^${fa.regex}$`);
+            const result = regexPattern.test(string);
+            console.log(`Result for Regex: ${result}`);
         }
     };
 
@@ -305,11 +346,22 @@ export default function Soal5() {
                     </>
                 )}
                 <div className="mt-1 space-y-2">
+                <Label htmlFor="finalStates" className='String'>String</Label>
+                <Input
+                    type="text"
+                    placeholder="01"
+                    value={string}
+                    onChange={handleStringChange}
+                />
+                </div>
+
+                <div className="mt-1 space-y-2">
                     <Label htmlFor="automataType" className="jenisFA">Jenis Finite Automata</Label>
                     <Select defaultValue={jenisFA5} onValueChange={(v) => setjenisFA(v)}>
                         <SelectFA5 />
                     </Select>
                 </div>
+                
                 <div className="mt-8 px-1 py-5">
                     <Button onClick={onClickButtonGenerate}>Test</Button>
                 </div>
