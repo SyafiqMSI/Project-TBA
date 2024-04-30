@@ -19,6 +19,11 @@ export function CardWithForm() {
     marginTop: "20px",
   };
 
+  const disabledLinkStyle = {
+    cursor: 'not-allowed',
+    opacity: 0.5,
+  };
+
     return (
       <div className="Soal" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div className="top-cards" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: '20px' }}>
@@ -61,15 +66,13 @@ export function CardWithForm() {
               </CardHeader>
             </Card>
           </Link>
-          <Link href="/soal5">
-            <Card style={cardStyle}>
+          <Card style={{ ...cardStyle, ...disabledLinkStyle }} aria-disabled="true">
               <CardHeader>
                 <CardTitle>Testing</CardTitle>
                 <span style={{ margin: '5px' }}></span>
                 <CardDescription className="">Mengetes DFA, NFA, e-NFA ataupun reguler expression dengan memasukkan input berupa string untuk mengetahui apakah string tersebut di accept atau di reject</CardDescription>
               </CardHeader>
             </Card>
-          </Link>
         </div>
       </div>
     )
