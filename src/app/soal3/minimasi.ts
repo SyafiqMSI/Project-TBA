@@ -67,7 +67,6 @@ export function fillTable(dfa: DFA): Set<string> {
             if (dfa.finalStates.includes(state1) !== dfa.finalStates.includes(state2)) {
                 markDistinguishable(table, state1, state2);
             }
-            return table
         }
     });
 
@@ -109,9 +108,9 @@ function mergeStates(dfa: DFA, distinguishablePairs: Set<string>): DFA {
                 }
             });
             if (!found) {
-                const newState = `q${newStateList.size}`;
-                newStateList.set(newState, [state]);
-                stateMapping.set(state, newState);
+                
+                stateMapping.set(state, state);
+                newStateList.set(state, [state]);
             }
         }
     });
