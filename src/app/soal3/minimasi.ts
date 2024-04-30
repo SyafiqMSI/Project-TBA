@@ -1,14 +1,15 @@
 export interface DFA {
-    states: string[];
-    alphabet: string[];
-    transitionFunction: { [key: string]: string };
-    startState: string;
-    finalStates: string[];
+    states: string[]; // Kumpulan semua State di DFA
+    alphabet: string[]; // Kumpulan semua simbol dalam alfabet DFA
+    transitionFunction: { [key: string]: string }; // Fungsi transisi, mengaitkan state dan simbol ke state berikutnya
+    startState: string; // State awal DFA
+    finalStates: string[]; // Kumpulan semua state akhir DFA
 }
+// Fungsi untuk menginisialisasi pasangan yang dapat dibedakan pada DFA
 function initializeDistinguishability(dfa: DFA): Set<string> {
     let distinguishablePairs = new Set<string>();
     
-    // Mark directly distinguishable states (final vs. non-final)
+    // menandai state langsung yang dapat dibedakan (final state vs. non-final state)
     for (let i = 0; i < dfa.states.length; i++) {
         for (let j = i + 1; j < dfa.states.length; j++) {
             const state1 = dfa.states[i];
@@ -22,7 +23,7 @@ function initializeDistinguishability(dfa: DFA): Set<string> {
 
     return distinguishablePairs;
 }
-
+// fungsi untuk menyempurnakan pasangan yang dapat dibedakan pada DFA
 function refineDistinguishability(dfa: DFA, distinguishablePairs: Set<string>): boolean {
     let updated = false;
     dfa.states.forEach(state1 => {
@@ -47,20 +48,20 @@ function refineDistinguishability(dfa: DFA, distinguishablePairs: Set<string>): 
     });
     return updated;
 }
-// Util to mark pairs as distinguishable
+// // Utilitas untuk menandai pasangan yang dapat dibedakan
 function markDistinguishable(table: Set<string>, state1: string, state2: string) {
     table.add(`${state1},${state2}`);
     table.add(`${state2},${state1}`);
 }
-
+// Fungsi untuk menentukan apakah pasangan dapat dibedakan
 function isDistinguishable(table: Set<string>, state1: string, state2: string): boolean {
     return table.has(`${state1},${state2}`);
 }
-
+// Fungsi untuk mengisi tabel pasangan yang dapat dibedakan
 export function fillTable(dfa: DFA): Set<string> {
     const table = new Set<string>();
 
-    // Initial marking based on final/non-final states
+    // Penandaan awal berdasarkan final/non-final states
     dfa.states.forEach((state1, i) => {
         for (let j = i + 1; j < dfa.states.length; j++) {
             const state2 = dfa.states[j];
@@ -70,7 +71,7 @@ export function fillTable(dfa: DFA): Set<string> {
         }
     });
 
-    // Refine marks based on transitions
+    // Memperbarui penandaan berdasarkan transisi
     let changed = true;
     while (changed) {
         changed = false;
@@ -93,6 +94,7 @@ export function fillTable(dfa: DFA): Set<string> {
     return table;
 }
 
+// Fungsi untuk menggabungkan states pada DFA
 function mergeStates(dfa: DFA, distinguishablePairs: Set<string>): DFA {
     const stateMapping = new Map<string, string>();
     const newStateList = new Map<string, string[]>();
@@ -135,7 +137,7 @@ function mergeStates(dfa: DFA, distinguishablePairs: Set<string>): DFA {
         finalStates: newFinalStates
     };
 }
-
+// Fungsi utama untuk meminimalkan DFA
 export function minimizeDFA(dfa: DFA): DFA {
     let distinguishablePairs = initializeDistinguishability(dfa);
     while (refineDistinguishability(dfa, distinguishablePairs));
@@ -143,17 +145,17 @@ export function minimizeDFA(dfa: DFA): DFA {
 }
 
 
-
+// Fungsi untuk testing (mesimulasikan) DFA dengan masukan string tertentu
 export function simulateDFA(dfa: DFA, inputString: string): boolean {
     let currentState = dfa.startState;
 
     for (const symbol of inputString) {
         const transitionKey = `${currentState},${symbol}`;
         if (!dfa.transitionFunction.hasOwnProperty(transitionKey)) {
-            return false; 
+            return false; // jika tidak ada transisi untuk simbol tertentu, DFA berhenti
         }
         currentState = dfa.transitionFunction[transitionKey];
     }
 
-    return dfa.finalStates.includes(currentState);
+    return dfa.finalStates.includes(currentState); // mengembalikan apakah DFA berada di keadaan final states setelah membaca string masukan testing
 }
