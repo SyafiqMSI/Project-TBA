@@ -25,14 +25,16 @@ export default function Soal2() {
             5. Muhammad Syafiq Ibrahim      (L0122116)<br></br>
           </p>
 
-          <p style={{ fontSize: "1.0em" }}>
-            Soal:<br></br>
-            1. Menerima input untuk NFA ataupun e-NFA kemudian mengubahnya menjadi DFA yang berkaitan.<br></br>
-            2. Menerima input berupa regular expression dan dapat mengenerate e-NFA yang berhubungan.<br></br>
-            3. Menerima input berupa sebuah DFA kemudian membuat jadi minimal, dimana user dapat memasukkan input berupa string untuk mengetes DFA tesebut, baik sebelum maupun sesudah dalam bentuk minimal.<br></br>
-            4. Menerima input berupa dua buah DFA, kemudian menunjukkan keduanya ekuivalen atau tidak.<br></br>
-            5. Mengetes DFA, NFA, e-NFA ataupun reguler expression dengan memasukkan input berupa string untuk mengetahui apakah string tersebut di accept atau di reject.<br></br>
-          </p>
+          
+            <ul style={{ fontSize: "1.0em" }}>
+            Soal:<br></br><br></br>
+            <li>1. Menerima input untuk NFA ataupun e-NFA kemudian mengubahnya menjadi DFA yang berkaitan.<br /></li>
+            <li>2. Menerima input berupa regular expression dan dapat mengenerate e-NFA yang berhubungan.<br /></li>
+            <li>3. Menerima input berupa sebuah DFA kemudian membuat jadi minimal, dimana user dapat memasukkan input berupa string untuk mengetes DFA tesebut, baik sebelum maupun sesudah dalam bentuk minimal.<br /></li>
+            <li>4. Menerima input berupa dua buah DFA, kemudian menunjukkan keduanya ekuivalen atau tidak.<br /></li>
+            <li>5. Mengetes DFA, NFA, e-NFA ataupun reguler expression dengan memasukkan input berupa string untuk mengetahui apakah string tersebut di accept atau di reject.<br /></li>
+            </ul>
+          
         </div>
       </div>
     </main>

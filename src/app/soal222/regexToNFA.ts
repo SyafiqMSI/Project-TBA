@@ -1,5 +1,4 @@
 // regexToENFA.ts
-
 enum Type {
     SYMBOL = 1,
     CONCAT = 2,
@@ -101,6 +100,15 @@ class FiniteAutomataState {
     static id = 0; // Static counter to assign unique IDs
 }
 
+function evalRegexSymbol(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
+    const start_state = new FiniteAutomataState();
+    const end_state = new FiniteAutomataState();
+
+    start_state.next_state[et.value!] = [end_state];
+    return [start_state, end_state];
+}
+
+
 function evalRegex(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
     console.log(`Evaluating: Type = ${et._type}, Value = ${et.value}`);
     switch (et._type) {
@@ -123,50 +131,44 @@ function evalRegex(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataStat
     }
 }
 
-function evalRegexSymbol(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
+function evalRegexUnion(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
     const start_state = new FiniteAutomataState();
     const end_state = new FiniteAutomataState();
-
-    start_state.next_state[et.value!] = [end_state];
-    return [start_state, end_state];
-}
-
-function evalRegexUnion(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
-    const startState = new FiniteAutomataState();
-    const endState = new FiniteAutomataState();
     const [leftStart, leftEnd] = evalRegex(et.left!);
     const [rightStart, rightEnd] = evalRegex(et.right!);
 
-    startState.next_state['epsilon'] = [leftStart, rightStart];  // Links to both left and right NFA starts
-    leftEnd.next_state['epsilon'] = leftEnd.next_state['epsilon'] || [];
-    leftEnd.next_state['epsilon'].push(endState);               // Link both NFA ends to the new end state
-    rightEnd.next_state['epsilon'] = rightEnd.next_state['epsilon'] || [];
-    rightEnd.next_state['epsilon'].push(endState);
+    start_state.next_state['eps'] = [leftStart, rightStart];
+    leftEnd.next_state['eps'] = leftEnd.next_state['eps'] || [];
+    leftEnd.next_state['eps'].push(end_state);
+    rightEnd.next_state['eps'] = rightEnd.next_state['eps'] || [];
+    rightEnd.next_state['eps'].push(end_state);
 
-    return [startState, endState];
+    return [start_state, end_state];
 }
+
+function evalRegexKleene(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
+    const start_state = new FiniteAutomataState();
+    const end_state = new FiniteAutomataState();
+    const [subStart, subEnd] = evalRegex(et.left!);
+
+    start_state.next_state['eps'] = [subStart, end_state];
+    subEnd.next_state['eps'] = subEnd.next_state['eps'] || [];
+    subEnd.next_state['eps'].push(start_state, end_state);
+
+    return [start_state, end_state];
+}
+
 
 function evalRegexConcat(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
     const [leftStart, leftEnd] = evalRegex(et.left!);
     const [rightStart, rightEnd] = evalRegex(et.right!);
 
-    leftEnd.next_state['epsilon'] = leftEnd.next_state['epsilon'] || [];
-    leftEnd.next_state['epsilon'].push(rightStart);             // Directly link left NFA end to right NFA start
+    leftEnd.next_state['eps'] = leftEnd.next_state['eps'] || [];
+    leftEnd.next_state['eps'].push(rightStart);
 
     return [leftStart, rightEnd];
 }
 
-function evalRegexKleene(et: ExpressionTree): [FiniteAutomataState, FiniteAutomataState] {
-    const startState = new FiniteAutomataState();
-    const endState = new FiniteAutomataState();
-    const [subStart, subEnd] = evalRegex(et.left!);
-
-    startState.next_state['epsilon'] = [subStart, endState];    // Skip or proceed into NFA
-    subEnd.next_state['epsilon'] = subEnd.next_state['epsilon'] || [];
-    subEnd.next_state['epsilon'].push(subStart, endState);      // Loop back or finish
-
-    return [startState, endState];
-}
 
 function printTransitionTable(finiteAutomata: [FiniteAutomataState, FiniteAutomataState]): string {
     let table = "State\t\tSymbol\t\tNext state\n";
@@ -174,37 +176,10 @@ function printTransitionTable(finiteAutomata: [FiniteAutomataState, FiniteAutoma
     const stateMapping = new Map<FiniteAutomataState, string>();
     const statesDone = new Set<FiniteAutomataState>();
 
-    // Collect all final states
-    const finalStates: FiniteAutomataState[] = [];
-    const collectFinalStates = (state: FiniteAutomataState) => {
-        if (state === finalState) {
-            finalStates.push(state);
-            return;
-        }
-        for (const transitions of Object.values(state.next_state)) {
-            for (const nextState of transitions) {
-                collectFinalStates(nextState);
-            }
-        }
-    };
-    collectFinalStates(finalState);
-
-    printStateTransitions(startState, statesDone, stateMapping, new Set(finalStates));
-
     function printStateTransitions(
         state: FiniteAutomataState,
-        statesDone: Set<FiniteAutomataState>,
-        stateMapping: Map<FiniteAutomataState, string>,
-        finalStates: Set<FiniteAutomataState>
-    ): void {
-        if (statesDone.has(state)) return;
-        statesDone.add(state);
-
-        if (!stateMapping.has(state)) {
-            stateMapping.set(state, `q${state.id}`);
-        }
-        const stateLabel = stateMapping.get(state)! + (finalStates.has(state) ? '*' : '');
-
+        stateMapping: Map<FiniteAutomataState, string>
+    ): string {
         let transitionsOutput: string[] = [];
         for (const symbol in state.next_state) {
             const transitions = state.next_state[symbol];
@@ -212,26 +187,40 @@ function printTransitionTable(finiteAutomata: [FiniteAutomataState, FiniteAutoma
                 if (!stateMapping.has(nextState)) {
                     stateMapping.set(nextState, `q${nextState.id}`);
                 }
-                return stateMapping.get(nextState)! + (finalStates.has(nextState) ? '*' : '');
-            }).sort();
+                return stateMapping.get(nextState)!;
+            }).sort((a, b) => parseInt(a.substring(1)) - parseInt(b.substring(1)));
 
             transitionsOutput.push(`${symbol}\t\t\t\t${nextStateLabels.join(", ")}`);
         }
 
         // Check for any transitions to print, or print a placeholder for no transitions
         if (transitionsOutput.length > 0) {
-            table += `${stateLabel}\t\t\t${transitionsOutput.join("\n\t\t\t\t")}\n`;
+            return `${stateMapping.get(state)}\t\t\t${transitionsOutput.join(", ")}\n`;
         } else {
-            table += `\*${stateLabel}\t\t\t-\t\t\t\t-\n`;
+            return `*${stateMapping.get(state)}\t\t\t-\t\t\t\t-\n`;
         }
-
-        // Recursive call to next states, handling each transition array properly
-        Object.entries(state.next_state).forEach(([symbol, transitions]) => {
-            transitions.forEach(nextState => {
-                printStateTransitions(nextState, statesDone, stateMapping, finalStates);
-            });
-        });
     }
 
+    function traverseStates(state: FiniteAutomataState) {
+        if (statesDone.has(state)) return;
+        statesDone.add(state);
+
+        if (!stateMapping.has(state)) {
+            stateMapping.set(state, `q${state.id}`);
+        }
+        table += printStateTransitions(state, stateMapping);
+
+        for (const symbol in state.next_state) {
+            state.next_state[symbol].forEach(nextState => {
+                traverseStates(nextState);
+            });
+        }
+    }
+
+    traverseStates(startState);
     return table;
 }
+
+
+
+export { postfix, constructTree, evalRegex, printTransitionTable, FiniteAutomataState, ExpressionTree };
