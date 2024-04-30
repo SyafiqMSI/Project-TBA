@@ -10,6 +10,7 @@ import { postfix, constructTree, evalRegex, printTransitionTable } from './regex
 
 export default function Soal2() {
     const [regex, setRegex] = useState<string>("(a+b)*a.b.b");
+    const [transitionTable, setTransitionTable] = useState<string>("");
 
     const handleRegexChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newRegex = event.target.value;
@@ -22,7 +23,8 @@ export default function Soal2() {
             const expressionTree = constructTree(postfixed);
             const [startState, finalState] = evalRegex(expressionTree);
             console.log('E-NFA transition table:');
-            printTransitionTable([startState, finalState]);
+            const table = printTransitionTable([startState, finalState]);
+            setTransitionTable(table);
         } catch (error) {
             console.error("Error processing regex:", error);
         }
@@ -55,6 +57,12 @@ export default function Soal2() {
                 <div className="mt-8 px-1 py-5">
                     <Button onClick={onClickButtonGenerate}>Convert to e-NFA</Button>
                 </div>
+                {transitionTable && (
+                    <div className="mt-8">
+                        <h2 className="font-bold text-xl">E-NFA Transition Table</h2>
+                        <pre>{transitionTable}</pre>
+                    </div>
+                )}
             </div>
         </main>
     );
