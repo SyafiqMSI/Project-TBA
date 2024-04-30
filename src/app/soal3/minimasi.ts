@@ -28,15 +28,19 @@ function refineDistinguishability(dfa: DFA, distinguishablePairs: Set<string>): 
     dfa.states.forEach(state1 => {
         dfa.states.forEach(state2 => {
             if (!distinguishablePairs.has(`${state1},${state2}`)) {
+                let distinguishable = false
                 for (const symbol of dfa.alphabet) {
                     const nextState1 = dfa.transitionFunction[`${state1},${symbol}`];
                     const nextState2 = dfa.transitionFunction[`${state2},${symbol}`];
                     if (distinguishablePairs.has(`${nextState1},${nextState2}`)) {
-                        distinguishablePairs.add(`${state1},${state2}`);
-                        distinguishablePairs.add(`${state2},${state1}`);
-                        updated = true;
+                        distinguishable = true;
                         break;
                     }
+                }
+                if (distinguishable) {
+                    distinguishablePairs.add(`${state1},${state2}`);
+                    distinguishablePairs.add(`${state2},${state1}`);
+                    updated = true;
                 }
             }
         });
@@ -53,7 +57,7 @@ function isDistinguishable(table: Set<string>, state1: string, state2: string): 
     return table.has(`${state1},${state2}`);
 }
 
-function fillTable(dfa: DFA): Set<string> {
+export function fillTable(dfa: DFA): Set<string> {
     const table = new Set<string>();
 
     // Initial marking based on final/non-final states
@@ -63,6 +67,7 @@ function fillTable(dfa: DFA): Set<string> {
             if (dfa.finalStates.includes(state1) !== dfa.finalStates.includes(state2)) {
                 markDistinguishable(table, state1, state2);
             }
+            return table
         }
     });
 
@@ -79,9 +84,7 @@ function fillTable(dfa: DFA): Set<string> {
                         if (isDistinguishable(table, nextState1, nextState2)) {
                             markDistinguishable(table, state1, state2);
                             changed = true;
-                            return true;
                         }
-                        return false;
                     });
                 }
             });
