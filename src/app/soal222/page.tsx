@@ -1,4 +1,4 @@
-'use client'
+// page.tsx
 
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,7 @@ export default function Soal2() {
             const [startState, finalState] = evalRegex(expressionTree);
             console.log('E-NFA transition table:');
             const table = printTransitionTable([startState, finalState]);
-            setTransitionTable(table);
+            setTransitionTable(table); // Update the state with the transition table
         } catch (error) {
             console.error("Error processing regex:", error);
         }
