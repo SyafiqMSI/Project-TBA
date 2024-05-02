@@ -11,6 +11,9 @@ import { eNFAConverterRepository } from "./ts/konverterENFA";
 import { nfaConverterRepository } from "./ts/konverterNFA";
 import ComponentTableNFA from "./tabelNFA";
 import ComponentTableE_NFA from "./tabelENFA";
+import dynamic from "next/dynamic";
+import { diagramRepository } from "./ts/grafik";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import "./style.css";
 import {
   NFA2DFADataProps,
@@ -18,6 +21,9 @@ import {
 } from './ts/type';
 import { Button } from '@/components/ui/button';
 
+const MermaidComponent = dynamic(() => import("@/components/Mermaid"), {
+  ssr: false,
+});
 interface Transitions {
   [key: string]: string;
 }
@@ -38,7 +44,11 @@ export default function Soal1() {
     q1: "",
     q2: "",
   });
-
+  const [diagram, setDiagram] = useState({
+    nfa: "",
+    eNfa: "",
+    dfa: "",
+  });
 
   const [nfa2dfaData, setNfa2dfaData] = useState<NFA2DFADataProps>();
   const [eNfa2dfaData, setENfa2dfaData] = useState<E_NFA2DFADataProps>();
@@ -84,6 +94,11 @@ export default function Soal1() {
         transitions,
       });
       setNfa2dfaData(result);
+      setDiagram({
+        ...diagram,
+        nfa: diagramRepository.generateNFA(result.nfaData),
+        dfa: diagramRepository.generateDFA(result.dfaData),
+      });
     } else {
       const result = eNFAConverterRepository.generateDFA({
         states,
@@ -94,6 +109,11 @@ export default function Soal1() {
         epsilons,
       });
       setENfa2dfaData(result);
+      setDiagram({
+        ...diagram,
+        eNfa: diagramRepository.generateE_NFA(result.eNfaData),
+        dfa: diagramRepository.generateDFA(result.dfaData),
+      });
     }
   };
 
@@ -114,9 +134,9 @@ export default function Soal1() {
           Menerima input untuk NFA ataupun e-NFA kemudian mengubahnya menjadi DFA yang berkaitan
         </p>
       </div>
-      <div id='container' className="mx-left px-9 max-w-[950px] py-1 mt-1">
+      <div id='container' className="mx-left px-9 max-w-[1650px] py-1 mt-1">
 
-        <div className="gap-2 grid grid-cols-3">
+        <div className="gap-2 grid grid-cols-4">
           <div className="mx-left px-1 max-w-[540px] py-1" style={{ marginRight: '20px' }}>
             <div className="mt-1 space-y-2">
               <div className="mt-5 space-y-2">
@@ -213,9 +233,29 @@ export default function Soal1() {
               {jenisFA === "e-nfa" && eNfa2dfaData && (
                 <ComponentTableE_NFA {...eNfa2dfaData} />
               )}
-
             </div>
+
+            
           </div>
+          <div className="mx-left max-w-[300px]" style={{ marginLeft: '30px' }}>
+              <Tabs defaultValue="nfa-e-nfa" className="w-full mt-4">
+                <TabsList className="w-full grid grid-cols-2">
+                  <TabsTrigger value="nfa-e-nfa">
+                    {jenisFA === "nfa" ? "NFA" : "Epsilon NFA"}
+                  </TabsTrigger>
+                  <TabsTrigger value="dfa">DFA</TabsTrigger>
+                </TabsList>
+                <TabsContent value="nfa-e-nfa" className="mt-4">
+                  <MermaidComponent
+                    id="diagram-nfa-e-nfa"
+                    chart={jenisFA === "nfa" ? diagram.nfa : diagram.eNfa}
+                  />
+                </TabsContent>
+                <TabsContent value="dfa" className="mt-4">
+                  <MermaidComponent id="diagram-dfa" chart={diagram.dfa} />
+                </TabsContent>
+              </Tabs>
+            </div>
         </div>
       </div>
     </main>
