@@ -3,10 +3,8 @@ import { DFADataProps, ENFADataProps, NFADataProps } from "./type";
 const generateDFA = (data: DFADataProps): string => {
   let code = "flowchart LR\n";
 
-  // create start state
   code += "\nstart[start]";
 
-  // create states
   for (const state of data.states) {
     if (data.finalStates.includes(state))
       code += "\n" + state + "(((" + state + ")))";
@@ -14,7 +12,6 @@ const generateDFA = (data: DFADataProps): string => {
   }
   code += "\n";
 
-  // connect start state
   code += "\nstart --> " + data.startState;
 
   // create transitions
@@ -34,10 +31,8 @@ const generateDFA = (data: DFADataProps): string => {
 const generateNFA = (data: NFADataProps): string => {
   let code = "flowchart LR";
 
-  // create start state
   code += "\nstart[start]";
 
-  // create states
   for (const state of data.states) {
     if (data.finalStates.includes(state))
       code += "\n" + state + "(((" + state + ")))";
@@ -45,10 +40,8 @@ const generateNFA = (data: NFADataProps): string => {
   }
   code += "\n";
 
-  // connect start state
   code += "\nstart --> " + data.startState;
 
-  // create transitions
   for (const transition of Object.entries(data.transitions)) {
     for (const alphabet of data.alphabets) {
       const state = transition[0];
@@ -67,10 +60,8 @@ const generateNFA = (data: NFADataProps): string => {
 const generateE_NFA = (data: ENFADataProps) => {
   let code = "flowchart LR";
 
-  // create start state
   code += "\nstart[start]";
 
-  // create states
   for (const state of data.states) {
     if (data.finalStates.includes(state))
       code += "\n" + state + "(((" + state + ")))";
@@ -78,10 +69,8 @@ const generateE_NFA = (data: ENFADataProps) => {
   }
   code += "\n";
 
-  // connect start state
   code += "\nstart --> " + data.startState;
 
-  // create transitions
   for (const transition of Object.entries(data.transitions)) {
     for (const alphabet of data.alphabets) {
       const state = transition[0];
@@ -94,7 +83,6 @@ const generateE_NFA = (data: ENFADataProps) => {
     }
   }
 
-  // create epsilon transitions
   console.log(data.epsilonTransitions);
   for (const epsilonTransition of Object.entries(data.epsilonTransitions)) {
     const state = epsilonTransition[0];
