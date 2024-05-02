@@ -19,7 +19,7 @@ const generateE_NFAData = (input: ENFAInputProps): ENFADataProps => {
     alphabets.forEach(alphabet => {
       transitionsTable[state][alphabet] = [];
     });
-    epsilonTransitions[state] = []; // Initialize all with empty array
+    epsilonTransitions[state] = []; 
   });
 
   
@@ -64,7 +64,6 @@ const generateFinalStatesWithClosure = (data: ENFADataProps): string[] => {
     [key: string]: string[];
   } = {};
 
-  // initialize empty table closure
   for (const transition of Object.entries(data.transitions)) {
     const currentState = transition[0];
     const epsilonStates = data.epsilonTransitions[currentState];
@@ -78,17 +77,14 @@ const generateFinalStatesWithClosure = (data: ENFADataProps): string[] => {
     const currentState = transition[0];
     const epsilonStates = data.epsilonTransitions[currentState];
 
-    // console.log({ currentState, epsilonStates });
 
     if (epsilonStates && epsilonStates.length > 0) {
-      console.log("closure", { currentState, epsilonStates });
 
       const closures: string[] = [];
 
       let currentEpsilonStates = [currentState, ...epsilonStates];
       while (currentEpsilonStates.length > 0) {
         const currentEpsilonState = currentEpsilonStates[0];
-        // const a = data.transitions[currentEpsilonState].epsilon;
         const a = data.epsilonTransitions[currentEpsilonState];
 
         if (a && currentEpsilonState !== currentState) {
@@ -101,13 +97,11 @@ const generateFinalStatesWithClosure = (data: ENFADataProps): string[] => {
         newFinalStates.push(currentState);
       }
 
-      console.log("closure", { currentState, closures });
       tableClosures[currentState].push(...closures);
       tableClosures[currentState].sort();
     }
   }
 
-  console.log("closure", { closureTables: tableClosures });
 
   return newFinalStates;
 };
@@ -135,12 +129,10 @@ const generateNewTransitions = (data: ENFADataProps) => {
             innerNewTransitions[alphabet] = [];
           }
 
-          // Menambahkan transisi yang ada pada key utama
           if (data.transitions[key] && data.transitions[key][alphabet]) {
             innerNewTransitions[alphabet].push(...data.transitions[key][alphabet]);
           }
 
-          // Menambahkan transisi yang ada pada epsilon jika ada
           if (data.transitions[epsilon] && data.transitions[epsilon][alphabet]) {
             innerNewTransitions[alphabet].push(...data.transitions[epsilon][alphabet]);
           }

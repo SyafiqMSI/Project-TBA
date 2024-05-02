@@ -48,7 +48,7 @@ function refineDistinguishability(dfa: DFA, distinguishablePairs: Set<string>): 
     });
     return updated;
 }
-// // Utilitas untuk menandai pasangan yang dapat dibedakan
+//  Utilitas untuk menandai pasangan yang dapat dibedakan
 function markDistinguishable(table: Set<string>, state1: string, state2: string) {
     table.add(`${state1},${state2}`);
     table.add(`${state2},${state1}`);
